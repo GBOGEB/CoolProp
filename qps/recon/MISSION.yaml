@@ -1,0 +1,77 @@
+schema: qps.recon.mission.v1
+mission_id: QPS-DARKLAND-RECON-COOLPROP-P1
+mission_class: foreign_land_reconnaissance
+status: ACTIVE
+visibility_state:
+  from: DARK
+  current: PARTIAL
+  target: PROVEN
+repo:
+  full_name: GBOGEB/CoolProp
+  class: foreign_fork
+  priority: P0
+  default_branch: master
+  frozen_baseline_sha: a3c743026521ff557f8c2e85701c726898b00e0b
+upstream:
+  full_name: CoolProp/CoolProp
+  branch: master
+  observed_sha: d5b0cfb51cd9a9343284cc5af8ebd6a8bd0eecc0
+  observed_date_utc: 2026-09-07T13:21:04Z
+  ahead_of_fork_point_commits: 513
+workers:
+  scout_target:
+    objective: confirm priority target and freeze baseline
+    state: PASS
+  scout_horizon:
+    objective: map root, build, src, include, dev, wrappers, tests, CI
+    state: IN_PROGRESS
+  scout_border:
+    objective: map upstream drift, dependencies, licence, CI, wrappers and physics boundaries
+    state: IN_PROGRESS
+  reader_cartographer:
+    objective: emit repo card, topography, build/dependency map and START_HERE
+    state: IN_PROGRESS
+  reader_entrypoint:
+    objective: map CoolProp.h to CoolProp.cpp to PropsSI
+    state: PASS
+  reader_deep_dive:
+    objective: map PropsSI to AbstractState to HEOS/Helmholtz to Helium model
+    state: IN_PROGRESS
+exploitation:
+  synthesizer: PENDING
+  prober: PENDING
+  harvester: PENDING
+disposition_options:
+  - PRUNE
+  - PARK
+  - REFERENCE
+  - EXTRACT
+  - ADAPT
+  - PROMOTE
+initial_disposition: INVESTIGATE
+qps_relevance:
+  - thermophysics
+  - cryogenics
+  - helium
+  - property_engine
+  - numerical_evidence
+victory_chain:
+  - target_identified_P0
+  - upstream_delta_quantified
+  - topology_emitted
+  - public_api_mapped
+  - abstractstate_heos_path_mapped
+  - helium_eos_and_bounds_mapped
+  - real_helium_property_probe_executes
+  - qplant_A_B_D_W_points_execute
+  - hepak_comparison_produced
+  - 2K_boundary_classified
+  - property_router_candidate_emitted
+  - disposition_recorded
+  - exact_sha_receipt_emitted
+stop_rules:
+  - do_not_modify_master
+  - do_not_claim_HEPAK_equivalence_without_crosscheck
+  - do_not_promote_2K_HeII_results_as_authoritative_from_CoolProp_alone
+  - stop_and_classify_first_runtime_or_validity_red
+next_mission_after_proof: yaml-grammar

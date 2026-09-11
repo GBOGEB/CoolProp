@@ -1,0 +1,71 @@
+schema: qps.recon.objectives.v2
+mission: QPS-DARKLAND-RECON-COOLPROP-P1
+objectives:
+  O1_ILLUMINATE:
+    transition: DARK_TO_GRAY_TO_PARTIAL_TO_LIT
+    prove: [purpose, ownership_upstream, topology, important_artifacts, dependencies, public_interfaces, executable_entrypoints, licence_trust_boundaries]
+  O2_ESTABLISH_LIFE:
+    transition: LIT_TO_EXECUTABLE
+    gate: executed_meaningful_steps_gt_0
+    anti_claim: README_instructions_are_not_runtime_proof
+  O3_FIND_VALUE:
+    inventory_classes: [FUNCTION, BLOCK, ALGORITHM, PATTERN, SKILL, AGENT, SERVICE, PIPELINE, DATASET, TEST, SCHEMA, TOOL, KNOWLEDGE]
+    gate: unique_or_materially_better_than_existing_mesh_capability
+  O4_REPAIR_OR_INCUBATE:
+    routes:
+      broken_code: Doctor
+      environment_or_runtime: Dockmaster
+      immature_repo: Incubator
+      uncertain_science_or_design: Scientist
+      host_health_opportunity: Ambassador
+  O5_ENGINEER:
+    gate: produce_one_minimal_locally_owned_capability_or_explicit_NO_HARVEST
+    owner: The_Engineer
+  O6_FEDERATE:
+    gate: at_least_one_separate_mesh_consumer_executes_capability
+  O7_RETURN_EVIDENCE:
+    gate: QA_message_home_sufficient_for_lifecycle_decision_without_repeating_expedition
+mission_DoD:
+  1_target_identity_and_source_upstream_known: PASS
+  2_licence_trust_boundary_classified: PASS_WITH_PROMOTION_HOLD_FOR_2K_AUTHORITY
+  3_repo_census_topography_emitted: PASS
+  4_main_executable_API_path_identified: PASS
+  5_one_deep_call_path_understood: PASS
+  6_smoke_execution_gt_0_steps: PENDING_EXACT_HEAD_RUNTIME
+  7_first_observed_failure_classified: PENDING_EXACT_HEAD_RUNTIME
+  8_repair_performed_or_explicitly_deferred: PENDING_FIRST_RED
+  9_transferable_capability_identified: PASS_PROPERTY_ENGINE_ADAPTER_CANDIDATE
+  10_engineer_adapter_skill_bridge_or_NO_HARVEST: PENDING
+  11_QA_independently_checks_claims: PENDING
+  12_exact_source_SHA_receipt_exists: PENDING_RUNTIME_RECEIPT
+  13_final_disposition_recorded: PENDING
+  14_message_home_emitted: PENDING
+mission_DoV:
+  DoV_1_LOCAL_VALUE_PROVEN:
+    chain: foreign_capability_to_extracted_or_adapted_to_local_execution_to_independent_QA_receipt
+    status: PENDING
+  DoV_2_FEDERATION_PROVEN:
+    chain: foreign_capability_to_Engineer_bridge_to_separate_Mesh_consumer_to_downstream_steps_gt_0_to_expected_result_to_exact_bound_receipt
+    status: PENDING
+  DoV_3_PERPETUATION_PROVEN:
+    chain: fresh_checkout_runner_to_capability_discovery_to_execution_without_expedition_knowledge_to_CI_or_recurrent_path_PASS_to_automatic_evidence_return
+    status: PENDING
+reciprocal_victory:
+  DoV_HOME:
+    statement: Mesh gained a proven capability
+    status: PENDING
+  DoV_HOST:
+    statement: investigated CoolProp fork was measurably improved without forcing QPS architecture onto it
+    status: IN_PROGRESS
+    current_evidence: [START_HERE, topography, smoke_workflow, upstream_sync_branch, recon_branch_separation]
+mission_completion_rule: DoD_can_PASS_even_when_capability_DoV_is_NO
+coolprop_specific_victory:
+  - illuminated
+  - upstream_current_boundary_known
+  - helium_path_deeply_mapped
+  - real_QPLANT_property_probe_executes
+  - first_red_recursively_resolved_or_governed_deferred
+  - Engineer_exposes_governed_property_adapter
+  - QA_emits_exact_bound_receipt
+  - separate_QPS_consumer_executes_adapter
+  - RETURN_with_PROMOTE_or_REFERENCE_disposition

@@ -1,0 +1,40 @@
+schema: qps.recon.repo_card.v1
+repo: GBOGEB/CoolProp
+upstream: CoolProp/CoolProp
+classification: foreign_fork
+priority: P0
+visibility: PARTIAL
+purpose: open-source thermophysical property engine with broad language wrappers and multiple backend families
+license:
+  type: MIT
+  status: CONFIRMED
+baseline:
+  branch: master
+  sha: a3c743026521ff557f8c2e85701c726898b00e0b
+  date_utc: 2025-11-10T23:00:56Z
+upstream_observed:
+  branch: master
+  sha: d5b0cfb51cd9a9343284cc5af8ebd6a8bd0eecc0
+  date_utc: 2026-09-07T13:21:04Z
+  commits_after_fork_point: 513
+main_surfaces:
+  public_cpp_api: include/CoolProp.h
+  high_level_impl: src/CoolProp.cpp
+  state_factory: src/AbstractState.cpp
+  heos_backend: src/Backends/Helmholtz
+  helium_model: dev/fluids/Helium.json
+  python_wrapper: wrappers/Python
+  build_root: CMakeLists.txt
+  python_build: pyproject.toml
+  dependencies: .gitmodules
+qps_first_use:
+  - helium property independent evidence lane
+  - property engine router abstraction
+  - A_B_D_W canonical point execution
+  - HEPAK crosscheck harness
+  - provenance-bound thermophysical adapter
+important_boundary:
+  statement: helium saturation and ancillary data expose Tmin 2.1768 K; 2 K He-II use is not automatically authoritative
+  qps_rule: REQUIRE_HEPAK_CROSSCHECK_BEFORE_PROMOTION
+initial_disposition: INVESTIGATE
+candidate_end_disposition: ADAPT_OR_PROMOTE
