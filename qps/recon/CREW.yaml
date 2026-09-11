@@ -1,4 +1,4 @@
-schema: qps.recon.crew.v3
+schema: qps.recon.crew.v4
 mission: QPS-DARKLAND-RECON
 routing_principle: observed_state_plus_BG_plus_target_CG_plus_receipt
 separation_of_powers:
@@ -52,6 +52,8 @@ squads:
       routes:
         source_or_code_defect: Doctor
         docker_runner_build_runtime_mcp_lldb_toolchain: Dockmaster
+        internal_component_wiring_or_flow_gap: Plumber
+        narrow_cross_boundary_link_gap: Tunneler
         scientific_uncertainty: Scientist
         integration_or_interface_gap: The_Engineer
         weak_repo_structure: Incubator
@@ -73,6 +75,28 @@ squads:
       recurse: classify_environmental_cause_then_minimal_fix_then_rerun_exact_failed_step
       emits: [environment_patch, runtime_receipt]
       hands_to: Smoker
+    Plumber:
+      primary: connect and repair internal pipes between components that already belong inside one repository or governed system boundary
+      secondary: make data, event, schema and execution flow explicit and testable end-to-end
+      asks: where_is_the_internal_flow_broken_missing_or_leaking
+      scope: [module_wiring, internal_APIs, dataflow, eventflow, queues, pipes, schema_handoffs, config_handoffs, CLI_to_library, adapter_to_cache, test_fixture_to_runtime, local_service_links]
+      boundary_rule: if_connection_crosses_repo_ownership_or_trust_boundary_handoff_to_Tunneler_or_The_Engineer
+      emits: [internal_flow_patch, pipe_map, flow_test_receipt]
+      hands_to: Smoker
+    Tunneler:
+      primary: create the smallest explicit virtual cross-link between exactly identified source and target nodes for a named CG
+      secondary: prove whether a direct point-to-point connection is viable before broader federation is engineered
+      asks: can_these_two_nodes_exchange_the_required_capability_through_one_governed_narrow_link
+      scope: [cross_repo_checkout, exact_SHA_dependency, narrow_API_bridge, artifact_handoff, receipt_handoff, single_consumer_link, temporary_MCP_or_CLI_link]
+      constraints:
+        - exact_source_and_target_identity_required
+        - provenance_and_security_controls_must_remain_visible
+        - no_hidden_backchannel
+        - no_authority_bypass
+        - no_SSOT_promotion_by_tunnel_alone
+        - tunnel_must_be_removed_or_graduate_to_Engineer_federation_contract
+      emits: [tunnel_contract, source_target_binding, cross_boundary_smoke_receipt]
+      hands_to: [QA_Officer_Signalman, The_Engineer]
     Ambassador:
       primary: improve the foreign or local fork itself while respecting its native identity and architecture
       secondary: leave the investigated land healthier, more understandable and more maintainable than found
@@ -93,10 +117,11 @@ squads:
       emits: [maturity_uplift, bootstrap_receipt]
       hands_to: The_Engineer
     The_Engineer:
-      primary: extract or adapt the usable primitive and construct adapters, bridges, pipelines and federation
-      secondary: keep locally-owned integration contracts thin while foreign implementation remains replaceable
+      primary: extract or adapt the usable primitive and construct durable adapters, bridges, pipelines and federation
+      secondary: replace successful provisional tunnels and local plumbing with maintained contracts where warranted
       asks: what_value_can_we_bring_home_and_make_consumable
       outputs: [adapter, bridge_yaml, mcp_tool, cli_wrapper, library_interface, schema_translator, runner_hook, docker_service, skill, pipeline_stage, event_contract, federation_manifest, consumer_example, integration_test]
+      consumes: [validated_tunnel_contracts, validated_internal_pipe_maps]
       emits: [locally_owned_capability, federation_contract, consumer_binding]
       hands_to: Smoker
   COMMAND:
@@ -115,7 +140,7 @@ squads:
     Governor:
       primary: enforce authority, licence, security, trust, SSOT, schema and promotion boundaries
       secondary: distinguish technical success from authorised adoption
-      checks: [licence, modification_rights, distribution_rights, security, authority_class, provenance, SSOT_admission, schema_conformance, supersession]
+      checks: [licence, modification_rights, distribution_rights, security, authority_class, provenance, SSOT_admission, schema_conformance, supersession, tunnel_boundary]
       decisions: [ACCEPT, HOLD, REJECT, QUARANTINE]
       emits: [governance_disposition]
   RETURN:
@@ -136,4 +161,4 @@ optional_reinforcements:
     trigger: telemetry_or_observability_gap
     candidate_technology: Telegraf
     primary: collect runtime, runner, Docker, CI, MCP and engineering telemetry for PCA_DMAIC_MIP
-core_loop: SCOUT_READ_SMOKE_FIRST_RED_TYPED_REPAIR_OR_SCIENCE_RESMOKE_THEN_AMBASSADOR_AND_OR_ENGINEER_QA_GOVERN_RETURN_STAY_OR_REINFORCE
+core_loop: SCOUT_READ_SMOKE_FIRST_RED_TYPED_REPAIR_PLUMB_TUNNEL_OR_SCIENCE_RESMOKE_THEN_AMBASSADOR_AND_OR_ENGINEER_QA_GOVERN_RETURN_STAY_OR_REINFORCE
