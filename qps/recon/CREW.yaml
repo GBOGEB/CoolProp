@@ -1,0 +1,122 @@
+schema: qps.recon.crew.v1
+mission: QPS-DARKLAND-RECON
+routing_principle: observed_state_plus_BG_plus_target_CG_plus_receipt
+roles:
+  Scout-1_Targeter:
+    phase: DISCOVER
+    primary: pick highest-value DARK or GRAY target
+    secondary: formulate mission hypothesis and priority rationale
+    emits: [target_card, priority, mission_hypothesis]
+    hands_to: Scout-2_Horizon
+  Scout-2_Horizon:
+    phase: DISCOVER
+    primary: broad repository sweep
+    secondary: identify hidden capability families and unvisited surfaces
+    emits: [topography_breadth_map, capability_census]
+    hands_to: Scout-3_Border
+  Scout-3_Border:
+    phase: DISCOVER
+    primary: map dependencies, upstream drift, licences, CI, wrappers, adjacent repos, external edges
+    secondary: identify ownership and reuse boundaries before extraction
+    emits: [border_map, dependency_map, upstream_status, licence_status]
+    hands_to: Reader-1_Cartographer
+  Reader-1_Cartographer:
+    phase: UNDERSTAND
+    primary: read README, manifests, docs and repository structure
+    secondary: produce a six-month-later orientation path
+    emits: [REPO_CARD, TOPOGRAPHY, BUILD_MAP, START_HERE]
+    hands_to: Reader-2_EntryPoint
+  Reader-2_EntryPoint:
+    phase: UNDERSTAND
+    primary: trace the main public executable or API entrypoint
+    secondary: identify stable contract surfaces suitable for adapters
+    emits: [primary_call_path, public_contract_map]
+    hands_to: Reader-3_DeepReader
+  Reader-3_DeepReader:
+    phase: UNDERSTAND
+    primary: penetrate one important subsystem end-to-end
+    secondary: expose hidden validity, data-model and implementation boundaries
+    emits: [deep_implementation_map, validity_boundaries]
+    hands_to: Smoker
+  Smoker:
+    phase: EXECUTE
+    primary: run the smallest realistic meaningful path immediately and stop on first observed red
+    secondary: deepen the probe only after the previous step is evidenced green
+    emits: [smoke_receipt, first_red]
+    dispatch:
+      code_defect: Doctor
+      runtime_or_environment_defect: Dockter
+      design_or_scientific_uncertainty: Scientist
+      contract_or_authority_defect: Governor
+      no_red: Evidence_Keeper
+  Doctor:
+    phase: REPAIR
+    primary: repair local software defects inside the repo or application boundary
+    secondary: add the smallest regression proof that prevents recurrence
+    scope: [imports, stale_apis, syntax, paths, tests, scripts, config, small_refactors, validation]
+    emits: [patch, regression_receipt]
+    hands_to: Smoker
+  Dockter:
+    phase: REPAIR
+    primary: repair execution environment and runtime plumbing
+    secondary: minimize and document the environment contract for reproducibility
+    scope: [docker, devcontainer, runner, github_actions, codespace, mcp, lldb_dap, compiler, toolchain, packages, mounts, filesystem, network_boundary, cross_platform]
+    recurse: classify_environmental_cause_then_minimal_fix_then_rerun_exact_failed_step
+    emits: [environment_patch, runtime_receipt]
+    hands_to: Smoker
+  Scientist:
+    phase: INVESTIGATE
+    primary: run experiments, comparisons and branch studies when normal repair is insufficient
+    secondary: form and test federation or substitution hypotheses
+    allowed: [experimental_branches, comparison_harnesses, monte_carlo, pca, benchmarks, alternate_adapters, bridge_prototypes, temporary_instrumentation]
+    forbidden: [direct_SSOT_promotion]
+    emits: [experiment_package, hypothesis_result]
+    hands_to: The_Orchestrator
+  Incubator:
+    phase: DEVELOP
+    primary: rehabilitate underdeveloped repositories with a minimal TRIAGE life-support envelope
+    secondary: import reusable global templates, skills and runners without rewriting the foreign project into QPS style
+    envelope: [START_HERE, REPO_INDEX, MANIFEST, SSOT_pointer, topology_census, runtime_entrypoint, smoke_test, CI_runner, docker_devcontainer_if_useful, agent_instructions, skill_registry, evidence_location, MIP_hooks]
+    emits: [maturity_uplift, bootstrap_receipt]
+    hands_to: Harvester
+  Harvester:
+    phase: EXTRACT
+    primary: extract the smallest reusable primitive, function, block, adapter, pattern or skill
+    secondary: separate foreign implementation details from the portable contract
+    emits: [reusable_capability, capability_contract]
+    hands_to: Federator
+  Federator:
+    phase: CONNECT
+    primary: bridge harvested capability into Mesh citizens without contaminating the adapter with federation-specific concerns
+    secondary: define consumers, versioning and evidence interfaces
+    target_nodes: [QPS, CODEX, ABACUS, notebooks, Excel_engine, evidence_layer, other_mesh_nodes]
+    emits: [federation_contract, consumer_bindings]
+    hands_to: Evidence_Keeper
+  Evidence_Keeper:
+    phase: PROVE
+    primary: bind exact source SHA, execution SHA, runtime receipt, provenance and artifact hashes
+    secondary: make prior successful work independently recoverable rather than chat-dependent
+    required_fields: [repo, source_sha, execution_sha, worker, probe, environment_digest, inputs, outputs, status, timestamp, artifact_hashes]
+    emits: [KEB_packet, evidence_receipt]
+    hands_to: Governor
+  Governor:
+    phase: CONTROL
+    primary: enforce licence, trust, authority, SSOT, Zod/schema and promotion boundaries
+    secondary: distinguish technical success from permitted or authoritative reuse
+    decisions: [ACCEPT, HOLD, REJECT]
+    checks: [licence, modification_rights, distribution_rights, authority_class, reference_only_boundary, SSOT_admission, schema_conformance, supersession]
+    emits: [governance_disposition]
+    hands_to: Reaper
+  Reaper:
+    phase: DECIDE
+    primary: assign controlled lifecycle disposition after reconnaissance and salvage
+    secondary: ensure valuable primitives are harvested before archive or prune
+    decisions: [PROMOTE, ADAPT, REFERENCE, INCUBATE, PARK, ARCHIVE, SUPERSEDE, PRUNE]
+    emits: [lifecycle_disposition]
+  The_Orchestrator:
+    phase: SUPERVISE_RECURSE
+    primary: choose next CG and worker from observed evidence rather than narrative TODO generation
+    secondary: expand or contract crew concurrency according to blocker class and distance to DoV
+    inputs: [observed_state, current_BG, target_CG, receipts, worker_availability]
+    emits: [execution_route, next_CG, fallback_routes]
+core_loop: SCOUT_READ_SMOKE_FIRST_RED_REPAIR_OR_INVESTIGATE_RESMOKE_PROVEN_INCUBATE_OR_HARVEST_FEDERATE_EVIDENCE_GOVERN_REAP
