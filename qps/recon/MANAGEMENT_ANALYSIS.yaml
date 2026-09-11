@@ -1,0 +1,143 @@
+schema: qps.recon.management_analysis.v1
+mission_id: QPS-DARKLAND-RECON-COOLPROP-P1
+secondments:
+  Project_Manager:
+    short: PM
+    seconded_from: DOW
+    authority: mission_delivery
+    owns:
+      - mission_charter
+      - scope_boundary
+      - work_breakdown
+      - wave_pulse_sequence
+      - dependencies
+      - crew_resource_budget
+      - risk_issue_action_register
+      - mission_DoD
+      - delivery_closure
+      - return_stay_reinforcement_recommendation
+      - DOW_synchronization
+    asks: are_we_delivering_the_correct_work_in_a_controlled_sequence
+    does_not_replace: The_Orchestrator
+    emits: [delivery_state, work_route, resource_request, DOW_closure_packet]
+  Technical_Manager:
+    short: TM
+    seconded_from: KEB
+    authority: technical_integrity
+    owns:
+      - technical_baseline
+      - assumptions
+      - interfaces
+      - validity_domains
+      - evidence_hierarchy
+      - architecture_integrity
+      - technical_risk
+      - cross_repo_technical_conflicts
+      - technical_acceptance_criteria
+      - technical_DoV_recommendation
+      - KEB_synchronization
+    asks: is_this_technically_correct_coherent_evidenced_and_valid_for_the_claimed_domain
+    separation:
+      Scientist: investigates_uncertainty
+      QA_Officer_Signalman: proves_execution_and_receipts
+      Governor: controls_authorised_promotion
+    emits: [technical_disposition, KEB_evidence_packet, technical_DoV_gate]
+  Analyst:
+    authority: decision_support_not_command
+    methods: [DMAIC, PCA, BT]
+    consumes:
+      - QA_receipts
+      - Observer_telemetry
+      - repo_census
+      - runtime_metrics
+      - DoD_DoV_metrics
+      - BG_CG_history
+      - resource_consumption
+      - failure_recurrence
+    DMAIC:
+      DEFINE: define_mission_gap_and_target_CG
+      MEASURE: use_observed_runtime_and_evidence_only
+      ANALYZE: identify_dominant_BG_and_driver_structure
+      IMPROVE: rank_highest_leverage_next_action
+      CONTROL: prove_improvement_persists_on_repeat_or_fresh_execution
+    PCA:
+      purpose: identify_latent_drivers_correlated_metrics_and_redundant_dimensions
+      rule: never_present_expert_seed_scores_as_measured_telemetry
+      current_status: DEFER_INSUFFICIENT_MEASURED_FEATURE_ROWS
+    BT:
+      purpose: rank_missions_blockers_actions_harvest_candidates_and_worker_allocations
+      reverse_pressure: test_what_must_be_false_for_the_top_ranked_action_to_lose_priority
+      current_status: OPERATIONAL_PROVISIONAL
+management_loop:
+  - DOW_to_PM
+  - KEB_to_TM
+  - Observer_and_QA_to_Analyst
+  - PM_TM_Analyst_to_The_Orchestrator
+  - execution_to_receipts
+  - receipts_back_to_DOW_and_KEB
+separation_of_powers:
+  PM: delivery_authority
+  TM: technical_authority
+  Analyst: measured_decision_pressure
+  The_Orchestrator: execution_dispatch
+  QA_Officer_Signalman: independent_receipt_verification
+  Governor: governance_and_promotion_authority
+  invariant: observed_execution_receipts_are_ground_truth
+observed_pulse:
+  source_pr: 1
+  pr_head_sha: cf3493158590e04fed817d5973bb2940ec11ad05
+  workflow_run_id: 34592924409
+  workflow_name: QPS Darkland CoolProp Recon
+  workflow_conclusion: success
+  observed_checkout_sha: fae40c1e58118682cfd48be8c97463722b9fc446
+  finding: workflow_step_named_exact_PR_head_actually_checked_out_pull_request_merge_ref
+  qplant_points:
+    A: PASS
+    B: PASS
+    D: PASS
+    W: PASS
+    BOUNDARY_2K: VALIDATION_REQUIRED
+  receipt_sha256: 9d4242b18762af30e610aa5e9b943e5651f6069a968eba0cdd5ac334dc8aedb7
+DMAIC_current:
+  DEFINE: achieve_exact_head_bound_runtime_evidence_then_advance_to_HEPAK_crosscheck_and_adapter
+  MEASURE:
+    qps_smoke_job: PASS
+    required_property_points_passed: 4
+    required_property_points_failed: 0
+    validation_required_points: 1
+    exact_PR_head_binding: FAIL
+  ANALYZE:
+    dominant_BG: BG-SHA-BINDING-MISMATCH
+    cause: default_pull_request_checkout_resolved_to_merge_ref_not_pull_request_head
+    consequence: runtime_capability_is_proven_but_current_exact_head_DoD_gate_is_not_satisfied
+  IMPROVE:
+    action: explicitly_checkout_expected_source_SHA_and_assert_git_HEAD_equals_expected_SHA_before_build
+    owner: Dockmaster
+  CONTROL:
+    gate: subsequent_PR_run_must_pass_explicit_exact_head_assertion_and_emit_receipt_bound_to_same_SHA
+BT_current_priority:
+  - rank: 1
+    action: repair_exact_head_checkout_and_assertion
+    reason: removes_false_green_evidence_binding_and_unlocks_QA_acceptance
+  - rank: 2
+    action: independently_QA_attest_new_exact_head_receipt
+    reason: closes_current_execution_evidence_gate
+  - rank: 3
+    action: build_HEPAK_crosscheck_harness
+    reason: dominant_remaining_technical_authority_BG_after_exact_head_evidence
+  - rank: 4
+    action: Engineer_governed_property_adapter
+    reason: converts_proven_foreign_capability_to_local_consumable_contract
+  - rank: 5
+    action: separate_QPS_consumer_execution
+    reason: required_for_DoV_2_federation
+BT_reverse_pressure:
+  top_rank_loses_priority_if:
+    - exact_head_is_already_proven_by_a_newer_bound_receipt
+    - current_mission_no_longer_requires_exact_source_identity
+  observed: neither_condition_is_true
+current_management_decision:
+  PM: STAY
+  TM: STAY_WITH_2K_PROMOTION_HOLD
+  Analyst: RECONFIGURE_TO_DOCKMASTER_SMOKER_QA_THEN_SCIENTIST_ENGINEER
+  next_CG: CG-EXACT-HEAD-HELIUM-PROBE
