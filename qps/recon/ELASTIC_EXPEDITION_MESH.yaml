@@ -1,0 +1,73 @@
+schema: qps.eem.v1
+name: Elastic Expedition Mesh
+operational_primitive: Mission_to_Wave_to_Pulse_to_Receipt_to_Reallocate_to_Recurse
+doctrine:
+  - expand_for_uncertainty_and_parallelism
+  - contract_for_convergence
+  - reconfigure_for_the_blocker
+  - return_workers_when_marginal_value_falls
+  - call_reinforcements_only_for_named_BG_specialty
+  - stop_on_DoV_or_when_evidence_says_to_stop
+layers:
+  Fleet_Expedition_Control:
+    owns: [global_worker_budget, mission_priority, reserve_capacity, cross_mission_reallocation]
+  Mission_Orchestrator:
+    owns: [target_state, local_BG, local_CG, pulse_routing, temporary_crew]
+  Wave:
+    values: [RECON, UNDERSTAND, EXECUTE, REPAIR, SCIENCE, ENGINEER, FEDERATE, RETURN]
+  Pulse:
+    definition: one_measured_execution_iteration_inside_a_wave
+  Crew:
+    definition: temporary_capability_assignment_not_permanent_agent_ownership
+  Receipt:
+    definition: evidence_of_what_executed_passed_failed_or_deferred
+  DoD:
+    levels: [pulse, wave, mission]
+  DoV:
+    definition: useful_capability_crossed_into_Mesh_and_survives_independently
+crew_actions: [EXPAND, HOLD, CONTRACT, RECONFIGURE]
+hysteresis:
+  expand_threshold: 0.75
+  hold_threshold: 0.45
+  contract_threshold: 0.30
+  minimum_role_residency_pulses: 1
+allocation_model:
+  conceptual_formula: Priority_times_Value_times_P_CG_advancement_times_Parallelism_divided_by_Cost_times_Risk
+  reserve_fraction_target: 0.15
+  reserve_fraction_range: [0.10, 0.20]
+  reserve_specialists: [Dockmaster, Scientist, The_Engineer, Governor, QA_Officer_Signalman]
+preferred_wave_seed_crews:
+  RECON: [Scout-1_Targeter, Scout-2_Surveyor, Scout-3_Border_Scout, Reader-1_Cartographer]
+  UNDERSTAND: [Reader-1_Cartographer, Reader-2_EntryPoint_Reader, Reader-3_Deep_Reader, Scientist]
+  EXECUTE: [Reader-2_EntryPoint_Reader, Smoker, QA_Officer_Signalman]
+  REPAIR: [Smoker, Doctor, Dockmaster, QA_Officer_Signalman]
+  ENGINEER: [The_Engineer, Scientist, Ambassador]
+  FEDERATE: [The_Engineer, The_Orchestrator, QA_Officer_Signalman, Governor]
+  RETURN: [QA_Officer_Signalman, Governor, Reaper]
+detachments:
+  allowed: true
+  rule: split_temporary_parallel_branches_then_reduce_receipts_at_next_pulse_boundary
+  promote_to_sub_mission_when: branch_is_independently_valuable_and_has_its_own_BG_CG_chain
+priority_dynamics:
+  rule: mission_priority_is_current_opportunity_not_static_repo_label
+  may_escalate_on: [unique_capability_found, named_QPS_blocker_unlocked, high_information_gain]
+  may_decay_on: [uncertainty_removed, federation_complete, documentation_only_remaining]
+return_semantics:
+  RETURN_HOME: worker_leaves_mission_and_sends_evidence
+  MISSION_RETURN: mission_finishes_current_expedition
+  MISSION_CLOSE: mission_DoD_complete_and_final_disposition_recorded
+  MISSION_VICTORY: mission_DoV_achieved
+completion:
+  recurse_until_any:
+    - DoV_achieved
+    - expected_value_next_pulse_below_continuation_threshold
+    - Governor_blocks_progression
+    - mission_superseded
+coolprop_current_assignment:
+  mission: QPS-DARKLAND-RECON-COOLPROP-P1
+  wave: EXECUTE
+  crew_action: RECONFIGURE
+  active_roles: [Reader-3_Deep_Reader, Smoker, QA_Officer_Signalman, Scientist]
+  reserve_roles: [Dockmaster, Doctor, The_Engineer, Governor, Ambassador]
+  BG: [BG-RUNTIME-UNKNOWN, BG-HEPAK-CROSSCHECK]
+  CG: [CG-HELIUM-PROBE]
