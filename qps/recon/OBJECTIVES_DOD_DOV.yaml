@@ -1,4 +1,4 @@
-schema: qps.recon.objectives.v1
+schema: qps.recon.objectives.v2
 mission: QPS-DARKLAND-RECON-COOLPROP-P1
 objectives:
   O1_ILLUMINATE:
@@ -14,10 +14,11 @@ objectives:
   O4_REPAIR_OR_INCUBATE:
     routes:
       broken_code: Doctor
-      environment: Dockter
+      environment_or_runtime: Dockmaster
       immature_repo: Incubator
       uncertain_science_or_design: Scientist
-  O5_HARVEST_AND_ENGINEER:
+      host_health_opportunity: Ambassador
+  O5_ENGINEER:
     gate: produce_one_minimal_locally_owned_capability_or_explicit_NO_HARVEST
     owner: The_Engineer
   O6_FEDERATE:
@@ -30,8 +31,8 @@ mission_DoD:
   3_repo_census_topography_emitted: PASS
   4_main_executable_API_path_identified: PASS
   5_one_deep_call_path_understood: PASS
-  6_smoke_execution_gt_0_steps: PENDING_RUNTIME
-  7_first_observed_failure_classified: PENDING_RUNTIME
+  6_smoke_execution_gt_0_steps: PENDING_EXACT_HEAD_RUNTIME
+  7_first_observed_failure_classified: PENDING_EXACT_HEAD_RUNTIME
   8_repair_performed_or_explicitly_deferred: PENDING_FIRST_RED
   9_transferable_capability_identified: PASS_PROPERTY_ENGINE_ADAPTER_CANDIDATE
   10_engineer_adapter_skill_bridge_or_NO_HARVEST: PENDING
@@ -49,6 +50,14 @@ mission_DoV:
   DoV_3_PERPETUATION_PROVEN:
     chain: fresh_checkout_runner_to_capability_discovery_to_execution_without_expedition_knowledge_to_CI_or_recurrent_path_PASS_to_automatic_evidence_return
     status: PENDING
+reciprocal_victory:
+  DoV_HOME:
+    statement: Mesh gained a proven capability
+    status: PENDING
+  DoV_HOST:
+    statement: investigated CoolProp fork was measurably improved without forcing QPS architecture onto it
+    status: IN_PROGRESS
+    current_evidence: [START_HERE, topography, smoke_workflow, upstream_sync_branch, recon_branch_separation]
 mission_completion_rule: DoD_can_PASS_even_when_capability_DoV_is_NO
 coolprop_specific_victory:
   - illuminated
