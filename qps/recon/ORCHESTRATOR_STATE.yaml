@@ -1,33 +1,64 @@
-schema: qps.recon.orchestrator_state.v1
+schema: qps.recon.orchestrator_state.v2
 mission_id: QPS-DARKLAND-RECON-COOLPROP-P1
+fleet_architecture: Elastic_Expedition_Mesh
+wave: EXECUTE
+pulse: P1_SMOKE
 observed_state: PARTIAL
 target_state: PROVEN
+state_vector:
+  visibility: 0.82
+  execution: 0.20
+  scientific_confidence: 0.71
+  repair_confidence: 0.55
+  harvest_readiness: 0.25
+  federation_readiness: 0.00
+  evidence_completeness: 0.48
 BG:
-  id: BG-RUNTIME-UNKNOWN
-  class: runtime_unknown
-  statement: no repo-bound exact-SHA helium property execution receipt exists yet
+  - id: BG-RUNTIME-UNKNOWN
+    class: runtime_unknown
+    statement: no exact-current-head repo-bound helium property execution receipt exists yet
+  - id: BG-HEPAK-CROSSCHECK
+    class: scientific_authority_boundary
+    statement: 2K helium authority remains unproven until independent HEPAK comparison exists
 CG:
-  id: CG-HELIUM-PROBE
-  transition: PARTIAL_TO_PROVEN
-  statement: execute smallest repo-native helium property probe and emit evidence receipt
+  - id: CG-HELIUM-PROBE
+    transition: PARTIAL_TO_PROVEN
+    statement: execute smallest repo-native helium property probe and emit exact-head evidence receipt
+parallelizable_work: 3
+crew_control:
+  action: RECONFIGURE
+  rationale: breadth reconnaissance is largely complete; execution, runtime repair and independent attestation now dominate marginal value
+  hysteresis:
+    expand_threshold: 0.75
+    hold_threshold: 0.45
+    contract_below: 0.30
+    minimum_role_residency_pulses: 1
+  current_seed_crew: [Reader-3_Deep_Reader, Smoker, QA_Officer_Signalman, Scientist]
+  reserve_candidates: [Dockmaster, Doctor, The_Engineer, Governor, Ambassador]
 route:
   worker: Smoker
   action: execute_qplant_helium_probe
   stop_on_first_red: true
   fallback:
     code_defect: Doctor
-    dependency_or_build_or_runner_defect: Dockter
+    dependency_or_build_or_runner_defect: Dockmaster
     scientific_disagreement_or_validity_uncertainty: Scientist
+    integration_or_interface_gap: The_Engineer
+    host_health_opportunity: Ambassador
     contract_authority_or_license_boundary: Governor
+    result_or_provenance_doubt: QA_Officer_Signalman
 success_next:
-  worker: Evidence_Keeper
-  action: bind_exact_sha_probe_receipt
+  worker: QA_Officer_Signalman
+  action: independently_attest_exact_sha_probe_receipt
 then:
   - Governor
-  - Harvester
-  - Federator
+  - The_Engineer
+  - Ambassador
   - Reaper
+mission_decision_options: [RETURN, STAY, CALL_REINFORCEMENTS, QUARANTINE, ABORT_PRUNE]
 constraints:
   fork_master_immutable: true
-  upstream_sync_branch_not_yet_created: true
+  upstream_sync_branch_created: true
+  upstream_sync_branch: sync/upstream-current
   promotion_requires_HEPAK_crosscheck_for_2K: true
+  stale_workflow_receipts_must_not_satisfy_current_head_gate: true
