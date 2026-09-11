@@ -1,4 +1,4 @@
-schema: qps.recon.crew.v2
+schema: qps.recon.crew.v3
 mission: QPS-DARKLAND-RECON
 routing_principle: observed_state_plus_BG_plus_target_CG_plus_receipt
 separation_of_powers:
@@ -6,6 +6,12 @@ separation_of_powers:
   smoker_executes: true
   qa_independently_attests: true
   governor_allows_promotion: true
+reciprocity:
+  doctrine: every expedition should seek both take-home value and leave-behind value when justified
+  TAKE_HOME_VALUE: capability_or_pattern_harvested_into_the_Mesh
+  LEAVE_BEHIND_VALUE: measurable_improvement_to_the_investigated_repo
+  DoV_HOME: Mesh_gained_a_proven_capability
+  DoV_HOST: investigated_repository_was_measurably_improved
 squads:
   RECON:
     Scout-1_Targeter:
@@ -45,34 +51,51 @@ squads:
       emits: [smoke_receipt, first_red]
       routes:
         source_or_code_defect: Doctor
-        docker_runner_build_runtime_mcp_lldb_toolchain: Dockter
+        docker_runner_build_runtime_mcp_lldb_toolchain: Dockmaster
         scientific_uncertainty: Scientist
         integration_or_interface_gap: The_Engineer
         weak_repo_structure: Incubator
+        foreign_repo_health_or_maintainability_opportunity: Ambassador
         licence_security_authority: Governor
         result_or_provenance_doubt: QA_Officer_Signalman
     Doctor:
-      primary: repair application and source-code defects
+      primary: repair defects inside the codebase
       secondary: add the smallest regression proof preventing recurrence
-      scope: [imports, stale_apis, syntax, paths, tests, scripts, config, validation, small_refactors]
+      asks: what_is_broken_inside_the_code
+      scope: [bugs, imports, stale_apis, syntax, paths, tests, scripts, config, validation, small_refactors]
       emits: [patch, regression_receipt]
       hands_to: Smoker
-    Dockter:
-      primary: repair Docker, runners, builds, runtime, MCP, LLDB_DAP and toolchains
-      secondary: minimize and document a reproducible execution environment
+    Dockmaster:
+      primary: repair or provision the execution habitat
+      secondary: minimize and document a reproducible runtime contract
+      asks: what_is_broken_or_missing_in_the_operating_theatre
       scope: [docker, devcontainer, runner, github_actions, codespace, mcp, lldb_dap, compiler, toolchain, packages, mounts, filesystem, network_boundary, cross_platform]
       recurse: classify_environmental_cause_then_minimal_fix_then_rerun_exact_failed_step
       emits: [environment_patch, runtime_receipt]
       hands_to: Smoker
+    Ambassador:
+      primary: improve the foreign or local fork itself while respecting its native identity and architecture
+      secondary: leave the investigated land healthier, more understandable and more maintainable than found
+      asks: how_can_this_place_become_healthier_and_more_useful
+      preferred_before_incubator_for_upstream_forks: true
+      scope: [documentation, START_HERE, topology, capability_maps, examples, smoke_tests, regression_tests, CI, manifests, metadata, upstream_sync_instructions, local_fork_maintainability, integration_examples, upstream_contribution_preparation]
+      constraints:
+        - do_not_force_QPS_structure_onto_foreign_repo
+        - do_not_confuse_repository_improvement_with_Mesh_federation
+        - may_succeed_without_any_code_defect
+      emits: [host_improvement_patch, host_health_receipt, upstream_contribution_candidate]
+      hands_to: QA_Officer_Signalman
     Incubator:
       primary: give immature repos the minimum TRIAGE life-support envelope and shared services
-      secondary: uplift maturity without rewriting foreign projects into QPS style
+      secondary: uplift maturity where native structure is insufficient for sustained operation
+      intervention_level: stronger_than_Ambassador
       envelope: [START_HERE, REPO_INDEX, MANIFEST, SSOT_pointer, topology_census, runtime_entrypoint, smoke_test, CI_runner, docker_devcontainer_if_useful, agent_instructions, skill_registry, evidence_location, MIP_hooks]
       emits: [maturity_uplift, bootstrap_receipt]
       hands_to: The_Engineer
     The_Engineer:
-      primary: extract the usable primitive, adapt it, build its bridge or pipeline, prove its interface and connect it to a Mesh consumer
+      primary: extract or adapt the usable primitive and construct adapters, bridges, pipelines and federation
       secondary: keep locally-owned integration contracts thin while foreign implementation remains replaceable
+      asks: what_value_can_we_bring_home_and_make_consumable
       outputs: [adapter, bridge_yaml, mcp_tool, cli_wrapper, library_interface, schema_translator, runner_hook, docker_service, skill, pipeline_stage, event_contract, federation_manifest, consumer_example, integration_test]
       emits: [locally_owned_capability, federation_contract, consumer_binding]
       hands_to: Smoker
@@ -113,4 +136,4 @@ optional_reinforcements:
     trigger: telemetry_or_observability_gap
     candidate_technology: Telegraf
     primary: collect runtime, runner, Docker, CI, MCP and engineering telemetry for PCA_DMAIC_MIP
-core_loop: SCOUT_READ_SCIENCE_OR_SMOKE_FIRST_RED_TYPED_ACTION_RESMOKE_QA_GOVERN_RETURN_OR_STAY_THEN_ENGINEER_FEDERATION_FRESH_CONSUMER_PROOF
+core_loop: SCOUT_READ_SMOKE_FIRST_RED_TYPED_REPAIR_OR_SCIENCE_RESMOKE_THEN_AMBASSADOR_AND_OR_ENGINEER_QA_GOVERN_RETURN_STAY_OR_REINFORCE
