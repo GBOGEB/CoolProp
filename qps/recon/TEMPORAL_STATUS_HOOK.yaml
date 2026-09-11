@@ -1,0 +1,155 @@
+schema: qps.recon.temporal_status.v1
+mission_id: QPS-DARKLAND-RECON-COOLPROP-P1
+purpose: append_only_temporal_progress_hook_for_recursive_mission_control
+principles:
+  canonical_table_is_authoritative: true
+  dashboards_are_derived_views_only: true
+  append_only_event_log: true
+  every_pulse_links_to_parent_event: true
+  every_event_records_BG_CG_crew_receipts_and_decision: true
+  current_snapshot_is_cache_not_history: true
+  next_turn_restart_from_latest_accepted_event: true
+canonical_status_columns:
+  - mission
+  - wave
+  - pulse
+  - state
+  - BG
+  - CG
+  - crew
+  - DoD
+  - DoV
+  - next_decision
+compact_dashboard_projections:
+  status_ribbon: mission_state_runtime_evidence_harvest_federation_DoD_DoV
+  progress_bars: normalized_0_to_1_metrics
+  state_path: DARK_to_GRAY_to_PARTIAL_to_LIT_to_EXECUTABLE_to_HARVESTED_to_FEDERATED_to_PERPETUATED
+  event_timeline: timestamped_major_transitions
+  delta_strip: only_changes_since_previous_event
+  blocker_stack: ranked_current_BG_with_owner
+  crew_strip: active_reserved_returned_workers
+  traffic_lights: GREEN_AMBER_RED_GRAY_by_gate
+recursion_contract:
+  read_latest_event: true
+  reduce_current_state: true
+  derive_next_BG: true
+  derive_next_CG: true
+  reallocate_crew: true
+  execute_smallest_useful_pulse: true
+  append_new_event: true
+  emit_message_home: true
+  recurse_until: [DoV_achieved, Governor_hold, value_below_threshold, mission_superseded, governed_return]
+current_snapshot:
+  observed_at_utc: 2026-09-11T14:41:00Z
+  repo: GBOGEB/CoolProp
+  master_sha: ee16f902af3a121022e7395590f9c95f1ea4c00d
+  mission_state: EXECUTABLE
+  qualified_state: PROVEN_FOR_A_B_D_W_ONLY
+  current_wave: CONTROL_TO_SCIENCE
+  current_pulse: P3_EXACT_HEAD_ACCEPTED
+  BG:
+    - id: BG-HEPAK-CROSSCHECK
+      owner: [Scientist, Technical_Manager]
+      severity: HIGH
+      statement: 2K_helium_authority_requires_independent_HEPAK_comparison
+    - id: BG-LOCAL-ADAPTER-MISSING
+      owner: The_Engineer
+      severity: MEDIUM
+      statement: no_governed_locally_owned_property_adapter_exists_yet
+    - id: BG-FEDERATION-CONSUMER-MISSING
+      owner: [The_Engineer, QA_Officer_Signalman]
+      severity: MEDIUM
+      statement: no_separate_QPS_consumer_has_executed_the_adapter
+  retired_BG:
+    - BG-RUNTIME-UNKNOWN
+    - BG-SHA-BINDING-MISMATCH
+  next_CG:
+    - CG-HEPAK-CROSSCHECK
+    - CG-GOVERNED-PROPERTY-ADAPTER
+    - CG-SEPARATE-QPS-CONSUMER
+  crew:
+    active: [Project_Manager, Technical_Manager, Analyst, Scientist, The_Engineer, QA_Officer_Signalman]
+    reserve: [Dockmaster, Doctor, Ambassador, Governor]
+    returned: [Scout-1_Targeter, Scout-2_Surveyor, Scout-3_Border_Scout, Reader-1_Cartographer, Reader-2_EntryPoint_Reader]
+  metrics:
+    visibility: 0.95
+    runtime_proof: 1.00
+    evidence_completeness: 0.80
+    technical_confidence: 0.76
+    repair_closure: 1.00
+    harvest_readiness: 0.55
+    federation_readiness: 0.10
+    mission_DoD: 0.76
+    mission_DoV_level: 0
+  management_decision:
+    PM: STAY
+    TM: STAY_WITH_2K_PROMOTION_HOLD
+    Analyst: RECONFIGURE_FROM_DOCKMASTER_TO_SCIENTIST_ENGINEER_QA
+    Orchestrator: CONTRACT_RECON_EXPAND_ENGINEERING
+  message_home:
+    color: AMBER
+    summary: exact_head_execution_is_now_proven_for_A_B_D_W;_runtime_and_SHA_binding_BGs_retired;_remaining_path_is_HEPAK_crosscheck_then_adapter_then_independent_consumer
+latest_accepted_event_id: EVT-0006
+events:
+  - id: EVT-0001
+    parent: null
+    time_utc: 2026-09-11T11:00:29Z
+    type: MISSION_SEED
+    state_after: DARK_TO_PARTIAL_RECON
+    evidence: commit_73562a583a385a9423064c1e6161fac2cc2ab10e
+    decision: STAY
+  - id: EVT-0002
+    parent: EVT-0001
+    time_utc: 2026-09-11T11:41:00Z
+    type: RUNTIME_PROBE
+    state_after: EXECUTABLE_BUT_PROVENANCE_UNCERTAIN
+    evidence:
+      workflow_run_id: 34592924409
+      required_points: {A: PASS, B: PASS, D: PASS, W: PASS}
+      boundary_2K: VALIDATION_REQUIRED
+      receipt_sha256: 9d4242b18762af30e610aa5e9b943e5651f6069a968eba0cdd5ac334dc8aedb7
+    discovered_BG: BG-SHA-BINDING-MISMATCH
+    decision: STAY
+  - id: EVT-0003
+    parent: EVT-0002
+    time_utc: 2026-09-11T12:45:18Z
+    type: RECON_MERGE
+    state_after: RECON_BASELINE_MERGED
+    evidence: merge_commit_49323d609675f4dd79838bf6a5356f13b7134f4e
+    decision: RECONFIGURE
+  - id: EVT-0004
+    parent: EVT-0003
+    time_utc: 2026-09-11T14:05:17Z
+    type: CONTROL_REPAIR_OPENED
+    state_after: EXACT_HEAD_REPAIR_UNDER_TEST
+    evidence: PR_3_head_8c50a1f6698b8d0b4399114ce0e7fd456a43dbd7
+    crew_delta:
+      added: [Project_Manager, Technical_Manager, Analyst, Dockmaster]
+      returned: [broad_recon_roles]
+    decision: STAY
+  - id: EVT-0005
+    parent: EVT-0004
+    time_utc: 2026-09-11T14:08:42Z
+    type: EXACT_HEAD_PROOF
+    state_after: EXACT_HEAD_RUNTIME_PROVEN
+    evidence:
+      workflow_run_id: 34608065034
+      job_id: 103291313097
+      head_sha: 8c50a1f6698b8d0b4399114ce0e7fd456a43dbd7
+      runner_id: 1000245110
+      checkout_exact_source_head: PASS
+      assert_exact_source_head: PASS
+      build: PASS
+      helium_smoke: PASS
+      artifact_upload: PASS
+    retired_BG: [BG-SHA-BINDING-MISMATCH, BG-RUNTIME-UNKNOWN]
+    decision: ADVANCE
+  - id: EVT-0006
+    parent: EVT-0005
+    time_utc: 2026-09-11T14:36:30Z
+    type: CONTROL_MERGE
+    state_after: EXECUTABLE_PROVEN_A_B_D_W
+    evidence: merge_commit_ee16f902af3a121022e7395590f9c95f1ea4c00d
+    next_BG: [BG-HEPAK-CROSSCHECK, BG-LOCAL-ADAPTER-MISSING, BG-FEDERATION-CONSUMER-MISSING]
+    crew_action: RECONFIGURE
+    decision: STAY
