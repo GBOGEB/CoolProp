@@ -44,12 +44,15 @@ jobs:
         id: smoker
         run: python qps/recon/probe_qplant_helium.py
 
+      - name: Execute W111 power/utility thermophysical adapter
+        id: power_utility
+        run: python qps/recon/probe_power_utility_thermo.py
+
       - name: Bind receipt checksums
         if: always()
         run: |
-          if [ -f qps/recon/receipts/coolprop_qplant_helium_smoke.json ]; then
-            sha256sum qps/recon/receipts/coolprop_qplant_helium_smoke.json | tee qps/recon/receipts/SHA256SUMS
-          fi
+          mkdir -p qps/recon/receipts
+          find qps/recon/receipts -maxdepth 1 -type f -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum | tee qps/recon/receipts/SHA256SUMS
 
       - name: Upload exact-run evidence
         if: always()
