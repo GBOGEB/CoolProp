@@ -1,0 +1,33 @@
+schema: qps.recon.orchestrator_state.v1
+mission_id: QPS-DARKLAND-RECON-COOLPROP-P1
+observed_state: PARTIAL
+target_state: PROVEN
+BG:
+  id: BG-RUNTIME-UNKNOWN
+  class: runtime_unknown
+  statement: no repo-bound exact-SHA helium property execution receipt exists yet
+CG:
+  id: CG-HELIUM-PROBE
+  transition: PARTIAL_TO_PROVEN
+  statement: execute smallest repo-native helium property probe and emit evidence receipt
+route:
+  worker: Smoker
+  action: execute_qplant_helium_probe
+  stop_on_first_red: true
+  fallback:
+    code_defect: Doctor
+    dependency_or_build_or_runner_defect: Dockter
+    scientific_disagreement_or_validity_uncertainty: Scientist
+    contract_authority_or_license_boundary: Governor
+success_next:
+  worker: Evidence_Keeper
+  action: bind_exact_sha_probe_receipt
+then:
+  - Governor
+  - Harvester
+  - Federator
+  - Reaper
+constraints:
+  fork_master_immutable: true
+  upstream_sync_branch_not_yet_created: true
+  promotion_requires_HEPAK_crosscheck_for_2K: true
