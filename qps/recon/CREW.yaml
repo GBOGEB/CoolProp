@@ -1,122 +1,116 @@
-schema: qps.recon.crew.v1
+schema: qps.recon.crew.v2
 mission: QPS-DARKLAND-RECON
 routing_principle: observed_state_plus_BG_plus_target_CG_plus_receipt
-roles:
-  Scout-1_Targeter:
-    phase: DISCOVER
-    primary: pick highest-value DARK or GRAY target
-    secondary: formulate mission hypothesis and priority rationale
-    emits: [target_card, priority, mission_hypothesis]
-    hands_to: Scout-2_Horizon
-  Scout-2_Horizon:
-    phase: DISCOVER
-    primary: broad repository sweep
-    secondary: identify hidden capability families and unvisited surfaces
-    emits: [topography_breadth_map, capability_census]
-    hands_to: Scout-3_Border
-  Scout-3_Border:
-    phase: DISCOVER
-    primary: map dependencies, upstream drift, licences, CI, wrappers, adjacent repos, external edges
-    secondary: identify ownership and reuse boundaries before extraction
-    emits: [border_map, dependency_map, upstream_status, licence_status]
-    hands_to: Reader-1_Cartographer
-  Reader-1_Cartographer:
-    phase: UNDERSTAND
-    primary: read README, manifests, docs and repository structure
-    secondary: produce a six-month-later orientation path
-    emits: [REPO_CARD, TOPOGRAPHY, BUILD_MAP, START_HERE]
-    hands_to: Reader-2_EntryPoint
-  Reader-2_EntryPoint:
-    phase: UNDERSTAND
-    primary: trace the main public executable or API entrypoint
-    secondary: identify stable contract surfaces suitable for adapters
-    emits: [primary_call_path, public_contract_map]
-    hands_to: Reader-3_DeepReader
-  Reader-3_DeepReader:
-    phase: UNDERSTAND
-    primary: penetrate one important subsystem end-to-end
-    secondary: expose hidden validity, data-model and implementation boundaries
-    emits: [deep_implementation_map, validity_boundaries]
-    hands_to: Smoker
-  Smoker:
-    phase: EXECUTE
-    primary: run the smallest realistic meaningful path immediately and stop on first observed red
-    secondary: deepen the probe only after the previous step is evidenced green
-    emits: [smoke_receipt, first_red]
-    dispatch:
-      code_defect: Doctor
-      runtime_or_environment_defect: Dockter
-      design_or_scientific_uncertainty: Scientist
-      contract_or_authority_defect: Governor
-      no_red: Evidence_Keeper
-  Doctor:
-    phase: REPAIR
-    primary: repair local software defects inside the repo or application boundary
-    secondary: add the smallest regression proof that prevents recurrence
-    scope: [imports, stale_apis, syntax, paths, tests, scripts, config, small_refactors, validation]
-    emits: [patch, regression_receipt]
-    hands_to: Smoker
-  Dockter:
-    phase: REPAIR
-    primary: repair execution environment and runtime plumbing
-    secondary: minimize and document the environment contract for reproducibility
-    scope: [docker, devcontainer, runner, github_actions, codespace, mcp, lldb_dap, compiler, toolchain, packages, mounts, filesystem, network_boundary, cross_platform]
-    recurse: classify_environmental_cause_then_minimal_fix_then_rerun_exact_failed_step
-    emits: [environment_patch, runtime_receipt]
-    hands_to: Smoker
-  Scientist:
-    phase: INVESTIGATE
-    primary: run experiments, comparisons and branch studies when normal repair is insufficient
-    secondary: form and test federation or substitution hypotheses
-    allowed: [experimental_branches, comparison_harnesses, monte_carlo, pca, benchmarks, alternate_adapters, bridge_prototypes, temporary_instrumentation]
-    forbidden: [direct_SSOT_promotion]
-    emits: [experiment_package, hypothesis_result]
-    hands_to: The_Orchestrator
-  Incubator:
-    phase: DEVELOP
-    primary: rehabilitate underdeveloped repositories with a minimal TRIAGE life-support envelope
-    secondary: import reusable global templates, skills and runners without rewriting the foreign project into QPS style
-    envelope: [START_HERE, REPO_INDEX, MANIFEST, SSOT_pointer, topology_census, runtime_entrypoint, smoke_test, CI_runner, docker_devcontainer_if_useful, agent_instructions, skill_registry, evidence_location, MIP_hooks]
-    emits: [maturity_uplift, bootstrap_receipt]
-    hands_to: Harvester
-  Harvester:
-    phase: EXTRACT
-    primary: extract the smallest reusable primitive, function, block, adapter, pattern or skill
-    secondary: separate foreign implementation details from the portable contract
-    emits: [reusable_capability, capability_contract]
-    hands_to: Federator
-  Federator:
-    phase: CONNECT
-    primary: bridge harvested capability into Mesh citizens without contaminating the adapter with federation-specific concerns
-    secondary: define consumers, versioning and evidence interfaces
-    target_nodes: [QPS, CODEX, ABACUS, notebooks, Excel_engine, evidence_layer, other_mesh_nodes]
-    emits: [federation_contract, consumer_bindings]
-    hands_to: Evidence_Keeper
-  Evidence_Keeper:
-    phase: PROVE
-    primary: bind exact source SHA, execution SHA, runtime receipt, provenance and artifact hashes
-    secondary: make prior successful work independently recoverable rather than chat-dependent
-    required_fields: [repo, source_sha, execution_sha, worker, probe, environment_digest, inputs, outputs, status, timestamp, artifact_hashes]
-    emits: [KEB_packet, evidence_receipt]
-    hands_to: Governor
-  Governor:
-    phase: CONTROL
-    primary: enforce licence, trust, authority, SSOT, Zod/schema and promotion boundaries
-    secondary: distinguish technical success from permitted or authoritative reuse
-    decisions: [ACCEPT, HOLD, REJECT]
-    checks: [licence, modification_rights, distribution_rights, authority_class, reference_only_boundary, SSOT_admission, schema_conformance, supersession]
-    emits: [governance_disposition]
-    hands_to: Reaper
-  Reaper:
-    phase: DECIDE
-    primary: assign controlled lifecycle disposition after reconnaissance and salvage
-    secondary: ensure valuable primitives are harvested before archive or prune
-    decisions: [PROMOTE, ADAPT, REFERENCE, INCUBATE, PARK, ARCHIVE, SUPERSEDE, PRUNE]
-    emits: [lifecycle_disposition]
-  The_Orchestrator:
-    phase: SUPERVISE_RECURSE
-    primary: choose next CG and worker from observed evidence rather than narrative TODO generation
-    secondary: expand or contract crew concurrency according to blocker class and distance to DoV
-    inputs: [observed_state, current_BG, target_CG, receipts, worker_availability]
-    emits: [execution_route, next_CG, fallback_routes]
-core_loop: SCOUT_READ_SMOKE_FIRST_RED_REPAIR_OR_INVESTIGATE_RESMOKE_PROVEN_INCUBATE_OR_HARVEST_FEDERATE_EVIDENCE_GOVERN_REAP
+separation_of_powers:
+  engineer_builds: true
+  smoker_executes: true
+  qa_independently_attests: true
+  governor_allows_promotion: true
+squads:
+  RECON:
+    Scout-1_Targeter:
+      primary: select priority DARK or GRAY target and mission hypothesis
+      secondary: rank expected value, uniqueness and direct Mesh relevance
+      emits: [target_card, priority, mission_hypothesis]
+    Scout-2_Surveyor:
+      primary: breadth census and topography
+      secondary: identify capability families, hidden surfaces and unexplored areas
+      emits: [topography_map, capability_census]
+    Scout-3_Border_Scout:
+      primary: map upstream, dependencies, neighbouring repos, licences and external edges
+      secondary: classify ownership, reuse and security boundaries before adaptation
+      emits: [border_map, dependency_map, upstream_status, licence_status]
+    Reader-1_Cartographer:
+      primary: read README, manifests, indexes, docs and repository narrative
+      secondary: create a six-month-later orientation path
+      emits: [REPO_CARD, TOPOGRAPHY, BUILD_MAP, START_HERE]
+    Reader-2_EntryPoint_Reader:
+      primary: trace main executable, API or code artifact
+      secondary: identify the narrowest stable contract for adaptation
+      emits: [primary_call_path, public_contract_map]
+    Reader-3_Deep_Reader:
+      primary: follow one important path to full implementation depth
+      secondary: expose physics, data-model, validity and implementation boundaries
+      emits: [deep_implementation_map, validity_boundaries]
+    Scientist:
+      primary: run experiments, alternatives, comparisons and hypotheses
+      secondary: test substitution, N-version, performance and federation possibilities
+      allowed: [experimental_branches, comparison_harnesses, monte_carlo, pca, benchmarks, alternate_adapters, bridge_prototypes, instrumentation]
+      forbidden: [direct_SSOT_promotion]
+      emits: [experiment_package, hypothesis_result]
+  ACTION:
+    Smoker:
+      primary: execute the smallest meaningful runtime path and stop on first observed red
+      secondary: deepen only after the previous execution step is evidenced green
+      emits: [smoke_receipt, first_red]
+      routes:
+        source_or_code_defect: Doctor
+        docker_runner_build_runtime_mcp_lldb_toolchain: Dockter
+        scientific_uncertainty: Scientist
+        integration_or_interface_gap: The_Engineer
+        weak_repo_structure: Incubator
+        licence_security_authority: Governor
+        result_or_provenance_doubt: QA_Officer_Signalman
+    Doctor:
+      primary: repair application and source-code defects
+      secondary: add the smallest regression proof preventing recurrence
+      scope: [imports, stale_apis, syntax, paths, tests, scripts, config, validation, small_refactors]
+      emits: [patch, regression_receipt]
+      hands_to: Smoker
+    Dockter:
+      primary: repair Docker, runners, builds, runtime, MCP, LLDB_DAP and toolchains
+      secondary: minimize and document a reproducible execution environment
+      scope: [docker, devcontainer, runner, github_actions, codespace, mcp, lldb_dap, compiler, toolchain, packages, mounts, filesystem, network_boundary, cross_platform]
+      recurse: classify_environmental_cause_then_minimal_fix_then_rerun_exact_failed_step
+      emits: [environment_patch, runtime_receipt]
+      hands_to: Smoker
+    Incubator:
+      primary: give immature repos the minimum TRIAGE life-support envelope and shared services
+      secondary: uplift maturity without rewriting foreign projects into QPS style
+      envelope: [START_HERE, REPO_INDEX, MANIFEST, SSOT_pointer, topology_census, runtime_entrypoint, smoke_test, CI_runner, docker_devcontainer_if_useful, agent_instructions, skill_registry, evidence_location, MIP_hooks]
+      emits: [maturity_uplift, bootstrap_receipt]
+      hands_to: The_Engineer
+    The_Engineer:
+      primary: extract the usable primitive, adapt it, build its bridge or pipeline, prove its interface and connect it to a Mesh consumer
+      secondary: keep locally-owned integration contracts thin while foreign implementation remains replaceable
+      outputs: [adapter, bridge_yaml, mcp_tool, cli_wrapper, library_interface, schema_translator, runner_hook, docker_service, skill, pipeline_stage, event_contract, federation_manifest, consumer_example, integration_test]
+      emits: [locally_owned_capability, federation_contract, consumer_binding]
+      hands_to: Smoker
+  COMMAND:
+    The_Orchestrator:
+      primary: choose next worker and target CG from observed state, BG and receipts
+      secondary: decide RETURN, STAY, CALL_REINFORCEMENTS, QUARANTINE or ABORT_PRUNE after each pulse
+      inputs: [observed_state, current_BG, target_CG, receipts, worker_availability, expected_value, resolution_probability, cost, risk]
+      information_gain_rule: expected_value_times_probability_next_pulse_resolves_BG_divided_by_cost_and_risk
+      decisions:
+        RETURN: objective_satisfied_and_evidence_sufficient
+        STAY: valuable_resolvable_question_remains_for_current_crew
+        CALL_REINFORCEMENTS: high_value_blocker_requires_other_specialty
+        QUARANTINE: licence_security_provenance_or_trust_uncertain
+        ABORT_PRUNE: low_value_low_uniqueness_high_burden
+      emits: [execution_route, next_CG, mission_decision]
+    Governor:
+      primary: enforce authority, licence, security, trust, SSOT, schema and promotion boundaries
+      secondary: distinguish technical success from authorised adoption
+      checks: [licence, modification_rights, distribution_rights, security, authority_class, provenance, SSOT_admission, schema_conformance, supersession]
+      decisions: [ACCEPT, HOLD, REJECT, QUARANTINE]
+      emits: [governance_disposition]
+  RETURN:
+    QA_Officer_Signalman:
+      primary: independently verify claims, receipts and provenance and send the message home
+      secondary: identify the next BG and CG without re-performing the worker's implementation
+      required_fields: [mission, target, observed_sha, mission_state, attempted_steps, executed_steps, passed, failed, deferred, claims, artifacts, recommendation, next_BG, next_CG, message_home]
+      rule: worker_performing_work_cannot_be_sole_authority_claiming_pass
+      emits: [qa_attestation, evidence_packet, message_home]
+      hands_to: Governor
+    Reaper:
+      primary: assign final lifecycle disposition after reconnaissance and salvage
+      secondary: ensure reusable value is extracted before destructive disposition
+      decisions: [PROMOTE, ADAPT, REFERENCE, INCUBATE, PARK, ARCHIVE, SUPERSEDE, PRUNE]
+      emits: [lifecycle_disposition]
+optional_reinforcements:
+  Observer:
+    trigger: telemetry_or_observability_gap
+    candidate_technology: Telegraf
+    primary: collect runtime, runner, Docker, CI, MCP and engineering telemetry for PCA_DMAIC_MIP
+core_loop: SCOUT_READ_SCIENCE_OR_SMOKE_FIRST_RED_TYPED_ACTION_RESMOKE_QA_GOVERN_RETURN_OR_STAY_THEN_ENGINEER_FEDERATION_FRESH_CONSUMER_PROOF
