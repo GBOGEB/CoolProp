@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - mission/w3-12-hepak-authority-gate
+      - mission/w3-12-canonical-hepak-intake
   pull_request:
     branches: [master]
   workflow_dispatch:
@@ -25,6 +26,11 @@ jobs:
         run: |
           expected="${{ github.event.pull_request.head.sha || github.sha }}"
           test "$(git rev-parse HEAD)" = "$expected"
+      - name: Prove canonical cryoplant HEPAK packet intake fail-closed
+        shell: bash
+        run: |
+          cd qps/w3_12
+          python -m unittest -v test_canonical_hepak_receipt.py
       - name: Execute governed HEPAK challenge
         id: challenge
         shell: bash
@@ -45,6 +51,9 @@ jobs:
           assert r['execution']['outcome'] == 'HOLD_EXTERNAL_LICENSED_NUMERIC_INPUT'
           assert r['reference_challenge']['status'] == 'HEPAK_2K_CROSSCHECK_REQUIRED'
           assert r['governed_adapter']['runtime_without_receipt_refuses_governing_value'] is True
+          assert r['governed_adapter']['canonical_child_receipt_supported'] is True
+          assert r['licensed_hepak_numeric_receipt_present'] is False
+          assert r['licensed_hepak_receipt_provenance'] is None
           assert r['dov2_promoted'] is False
           assert r['authority_transfer'] is False
           print(json.dumps(r, sort_keys=True))

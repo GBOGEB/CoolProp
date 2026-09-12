@@ -35,7 +35,12 @@ held = [name for name, d in decisions.items() if d["status"] == "HOLD"]
 # Guard against the exact governance failure W3-12 is meant to prevent.
 if receipt is None:
     if sorted(held) != sorted(EXACT_STATES):
-        raise AssertionError(("missing HEPAK receipt must hold every 2.0-4.5 K challenge state", decisions))
+        raise AssertionError(
+            (
+                "missing HEPAK receipt must hold every 2.0-4.5 K challenge state",
+                decisions,
+            )
+        )
     # Outside the mandatory band CoolProp may execute, but this is not a transfer
     # of QPLANT engineering authority.
     outside = provider_decision(10.0, hepak_receipt=None)
@@ -43,9 +48,33 @@ if receipt is None:
         raise AssertionError(outside)
 
 status = "REFERENCE_READY" if receipt is not None else "HEPAK_2K_CROSSCHECK_REQUIRED"
-outcome = "READY_FOR_REFERENCE_COMPARISON" if receipt is not None else "HOLD_EXTERNAL_LICENSED_NUMERIC_INPUT"
+outcome = (
+    "READY_FOR_REFERENCE_COMPARISON"
+    if receipt is not None
+    else "HOLD_EXTERNAL_LICENSED_NUMERIC_INPUT"
+)
+
+receipt_provenance = None
+if receipt is not None:
+    receipt_provenance = {
+        "provider": "HEPAK",
+        "provider_version": receipt.get("provider_version"),
+        "runtime_or_workbook_identity": receipt.get("runtime_or_workbook_identity"),
+        "input_sha256": receipt.get("input_sha256"),
+        "output_sha256": receipt.get("output_sha256"),
+        "receipt_file_sha256": receipt.get("receipt_file_sha256"),
+        "canonical_schema": receipt.get("canonical_schema"),
+        "canonical_producer_repo": receipt.get("canonical_producer_repo"),
+        "canonical_exporter_blob": receipt.get("canonical_exporter_blob"),
+        "canonical_validator_blob": receipt.get("canonical_validator_blob"),
+        "canonical_state_ids": receipt.get("canonical_state_ids"),
+        "runtime_host": receipt.get("runtime_host"),
+        "execution_date": receipt.get("execution_date"),
+        "authority_transfer": False,
+    }
+
 result = {
-    "schema": "qps-w3-12-hepak-authority-challenge/v1",
+    "schema": "qps-w3-12-hepak-authority-challenge/v2",
     "observed_at": datetime.now(timezone.utc).isoformat(),
     "repo": "GBOGEB/CoolProp",
     "source_sha": a.source_sha,
@@ -64,15 +93,21 @@ result = {
         "implemented": True,
         "mandatory_hepak_band_K": [2.0, 4.5],
         "runtime_without_receipt_refuses_governing_value": True,
+        "canonical_child_receipt_supported": True,
     },
     "licensed_hepak_numeric_receipt_present": receipt is not None,
+    "licensed_hepak_receipt_provenance": receipt_provenance,
     "external_consumer_authority_ready": receipt is not None,
     "dov2_promoted": False,
     "authority_transfer": False,
-    "first_red": None if receipt is not None else "MISSING_EXACT_LICENSED_HEPAK_NUMERIC_RECEIPT",
+    "first_red": (
+        None if receipt is not None else "MISSING_EXACT_LICENSED_HEPAK_NUMERIC_RECEIPT"
+    ),
 }
 
 out = Path(a.out)
 out.parent.mkdir(parents=True, exist_ok=True)
-out.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+out.write_text(
+    json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+)
 print(json.dumps(result, sort_keys=True))
