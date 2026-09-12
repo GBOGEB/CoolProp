@@ -1,0 +1,57 @@
+name: QPS W3-12 HEPAK Authority Gate
+
+on:
+  push:
+    branches:
+      - master
+      - mission/w3-12-hepak-authority-gate
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  authority-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact source head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Assert exact source head
+        shell: bash
+        run: |
+          expected="${{ github.event.pull_request.head.sha || github.sha }}"
+          test "$(git rev-parse HEAD)" = "$expected"
+      - name: Execute governed HEPAK challenge
+        id: challenge
+        shell: bash
+        run: |
+          cd qps/w3_12
+          python hepak_challenge.py \
+            --source-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --out ../recon/receipts/W3_12_HEPAK_AUTHORITY_HOLD.json
+      - name: Assert authority remains held without licensed numeric receipt
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('qps/recon/receipts/W3_12_HEPAK_AUTHORITY_HOLD.json')
+          r = json.loads(p.read_text())
+          assert r['execution']['steps_gt0'] is True
+          assert r['execution']['outcome'] == 'HOLD_EXTERNAL_LICENSED_NUMERIC_INPUT'
+          assert r['reference_challenge']['status'] == 'HEPAK_2K_CROSSCHECK_REQUIRED'
+          assert r['governed_adapter']['runtime_without_receipt_refuses_governing_value'] is True
+          assert r['dov2_promoted'] is False
+          assert r['authority_transfer'] is False
+          print(json.dumps(r, sort_keys=True))
+          PY
+      - name: Upload W3-12 hold receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: W3-12-HEPAK-authority-${{ github.event.pull_request.head.sha || github.sha }}
+          path: qps/recon/receipts/W3_12_HEPAK_AUTHORITY_HOLD.json
