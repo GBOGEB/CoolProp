@@ -1,0 +1,76 @@
+{
+  "schema": "qps.mission_i.federation_control.v1",
+  "mission": "M01_COOLPROP",
+  "wave": "W145",
+  "coolprop_runtime": {
+    "repo": "GBOGEB/CoolProp",
+    "pr": 7,
+    "exact_head_sha": "3f3b4b1e016a940b9b29102cf264bfac43d19e18",
+    "merge_sha": "9e5927ddae4678f1c38947b261bbb21e2425c7c2",
+    "workflow_run_id": 34707993462,
+    "job_id": 103591440737,
+    "artifact_id": 10302452576,
+    "artifact_digest_sha256": "af7e3b7625d45092e23430964e5526298b55dd2897bac243c6afc757da5e9f84",
+    "authority": "COMPATIBILITY_REFERENCE_CALCULATED"
+  },
+  "anchors": [
+    {
+      "role": "QPS_CHILD_STATIC_FEDERATION_AUTHORITY",
+      "repo": "GBOGEB/cryoplant-project",
+      "ref": "main",
+      "path": "triage/w145/QPS_W145_3REPO_NUMERICAL_DOV_REENTRY_v0.1.yaml",
+      "blob_sha": "8d8aa80b759c6362cd5ff1eb7085084bd4ce7f2f",
+      "required_tokens": [
+        "exact_head_sha: 3f3b4b1e016a940b9b29102cf264bfac43d19e18",
+        "three_repo_static_federation: ACHIEVED",
+        "KEB_semantic_propagation: ACHIEVED",
+        "DOW_analytical_propagation: ACHIEVED",
+        "engineering_authority_transfer_to_parent: false",
+        "formal_engineering_credit_delta: 0",
+        "formal_SAT_credit_delta: 0"
+      ]
+    },
+    {
+      "role": "KEB_SEMANTIC_REENTRY",
+      "repo": "GBOGEB/CODEX",
+      "ref": "main",
+      "path": "triage/W145_QPS_NUMERICAL_DOV_KEB_REENTRY.yaml",
+      "blob_sha": "ee62ad2e8c4f7668dcdd00bc6e7ca8d4cb38c87b",
+      "required_tokens": [
+        "exact_head_sha: 3f3b4b1e016a940b9b29102cf264bfac43d19e18",
+        "KEB_semantic_reentry: ACHIEVED",
+        "engineering_numerical_DOV: WITHHELD_CHILD_GATES",
+        "engineering_promotion_forbidden: true",
+        "downstream: GBOGEB/ABACUS"
+      ]
+    },
+    {
+      "role": "DOW_ANALYTICAL_REENTRY",
+      "repo": "GBOGEB/ABACUS",
+      "ref": "main",
+      "path": "triage/W145_QPS_NUMERICAL_DOV_DOW_REENTRY.yaml",
+      "blob_sha": "2142d1a463f33b966515670f35c780f51e697619",
+      "required_tokens": [
+        "exact_head_sha: 3f3b4b1e016a940b9b29102cf264bfac43d19e18",
+        "DOW_current_projection: ACHIEVED",
+        "engineering_numerical_DOV: WITHHELD_CHILD_GATES",
+        "engineering_promotion_forbidden: true",
+        "repo: GBOGEB/CODEX"
+      ]
+    }
+  ],
+  "control_invariants": [
+    "STATIC_FEDERATION_NE_ENGINEERING_DOV",
+    "COOLPROP_PASS_NE_HEPAK_PASS",
+    "COOLPROP_PASS_NE_SAT_QEQ_PASS",
+    "KEB_ACCEPT_NE_ENGINEERING_ACCEPT",
+    "DOW_ACCEPT_NE_ENGINEERING_ACCEPT",
+    "UNKNOWN_OR_DEFER_NE_ZERO"
+  ],
+  "promotion": {
+    "static_federation": "ACHIEVED",
+    "engineering_numerical_DOV": "WITHHELD_CHILD_GATES",
+    "formal_engineering_credit_delta": 0,
+    "formal_SAT_credit_delta": 0
+  }
+}
