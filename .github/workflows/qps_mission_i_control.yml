@@ -1,0 +1,42 @@
+name: QPS Mission I Control + Phase Telemetry
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'qps/recon/mission_i_control.py'
+      - 'qps/recon/TEMPORAL_STATUS_HOOK.yaml'
+      - 'qps/recon/STATUS_REPORT.md'
+      - '.github/workflows/qps_mission_i_control.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  mission-i-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout candidate control plane
+        uses: actions/checkout@v4
+
+      - name: Execute qualified-runtime staleness guard and phase telemetry
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python qps/recon/mission_i_control.py
+
+      - name: Bind telemetry checksum
+        if: always()
+        run: sha256sum qps/recon/receipts/mission_i_phase_telemetry.json | tee qps/recon/receipts/MISSION_I_PHASE_TELEMETRY_SHA256SUMS
+
+      - name: Upload Mission I control receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qps-mission-i-control-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            qps/recon/receipts/mission_i_phase_telemetry.json
+            qps/recon/receipts/MISSION_I_PHASE_TELEMETRY_SHA256SUMS
+          if-no-files-found: error
