@@ -5,6 +5,8 @@ on:
     branches: [master]
     paths:
       - 'qps/recon/mission_i_control.py'
+      - 'qps/recon/mission_i_federation_control.py'
+      - 'qps/recon/FEDERATION_CONTROL.json'
       - 'qps/recon/TEMPORAL_STATUS_HOOK.yaml'
       - 'qps/recon/STATUS_REPORT.md'
       - '.github/workflows/qps_mission_i_control.yml'
@@ -27,11 +29,18 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python qps/recon/mission_i_control.py
 
-      - name: Bind telemetry checksum
-        if: always()
-        run: sha256sum qps/recon/receipts/mission_i_phase_telemetry.json | tee qps/recon/receipts/MISSION_I_PHASE_TELEMETRY_SHA256SUMS
+      - name: Execute exact child KEB DOW federation drift guard
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python qps/recon/mission_i_federation_control.py
 
-      - name: Upload Mission I control receipt
+      - name: Bind control receipt checksums
+        if: always()
+        run: |
+          sha256sum qps/recon/receipts/mission_i_phase_telemetry.json | tee qps/recon/receipts/MISSION_I_PHASE_TELEMETRY_SHA256SUMS
+          sha256sum qps/recon/receipts/mission_i_federation_control.json | tee qps/recon/receipts/MISSION_I_FEDERATION_CONTROL_SHA256SUMS
+
+      - name: Upload Mission I control receipts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -39,4 +48,6 @@ jobs:
           path: |
             qps/recon/receipts/mission_i_phase_telemetry.json
             qps/recon/receipts/MISSION_I_PHASE_TELEMETRY_SHA256SUMS
+            qps/recon/receipts/mission_i_federation_control.json
+            qps/recon/receipts/MISSION_I_FEDERATION_CONTROL_SHA256SUMS
           if-no-files-found: error
