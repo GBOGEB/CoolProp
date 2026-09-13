@@ -22,7 +22,7 @@ RUN apt-get -y -m update && \
     apt-get install -y \
         g++ make cmake ninja-build swig doxygen p7zip-full \
         mono-mcs \
-        octave liboctave-dev \
+        octave octave-dev \
         r-base-dev \
         default-jre default-jdk \
         texlive-extra-utils \
