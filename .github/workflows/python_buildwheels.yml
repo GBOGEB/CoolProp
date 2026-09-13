@@ -6,6 +6,16 @@ on:
     tags: [ 'v*' ]
   pull_request:
     branches: [ 'master', 'main', 'develop' ]
+    # Mission-control receipts and documentation-base image changes do not
+    # alter the Python wheel product.  Keep these FAST/control surfaces from
+    # fan-out into the HEAVY wheel matrix while preserving the matrix for any
+    # product/build surface not explicitly excluded here.
+    paths-ignore:
+      - 'qps/**'
+      - '.github/workflows/qps_*.yml'
+      - '.github/workflows/qps-*.yml'
+      - 'dev/docker/**'
+      - '.github/workflows/docs_docker-build.yml'
 
 jobs:
   set-version:
