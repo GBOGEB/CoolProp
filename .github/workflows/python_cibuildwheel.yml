@@ -43,6 +43,36 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install requests packaging ninja
 
+    - name: Select Linux wheel compatibility policy
+      if: ${{ runner.os == 'Linux' }}
+      shell: bash
+      run: |
+        # Keep the historical manylinux2014 ABI for Python <=3.13.  The
+        # newest NumPy wheels no longer target that baseline, so for the
+        # observed 3.12/3.13 test environments install the newest compatible
+        # NumPy family before the CoolProp wheel is installed.
+        #
+        # Python 3.14 requires the newer manylinux baseline used by current
+        # NumPy wheels.  Change only that interpreter generation rather than
+        # silently raising the compatibility floor for every Linux wheel.
+        if [[ "${{ inputs.python-version }}" == "314" ]]; then
+          echo "CIBW_MANYLINUX_X86_64_IMAGE=manylinux_2_28" >> "$GITHUB_ENV"
+          echo "CIBW_MANYLINUX_AARCH64_IMAGE=manylinux_2_28" >> "$GITHUB_ENV"
+        else
+          echo "CIBW_MANYLINUX_X86_64_IMAGE=manylinux2014" >> "$GITHUB_ENV"
+          echo "CIBW_MANYLINUX_AARCH64_IMAGE=manylinux2014" >> "$GITHUB_ENV"
+        fi
+
+        # i686 is currently excluded by the caller and remains at the legacy
+        # baseline if re-enabled.
+        echo "CIBW_MANYLINUX_I686_IMAGE=manylinux2014" >> "$GITHUB_ENV"
+
+        case "${{ inputs.python-version }}" in
+          312|313)
+            echo "CIBW_BEFORE_TEST_LINUX=pip install 'numpy<2.3'" >> "$GITHUB_ENV"
+            ;;
+        esac
+        
     - name: Figure out the TestPyPi/PyPi Version
       shell: bash
       run: |
@@ -72,9 +102,7 @@ jobs:
         CIBW_ARCHS_WINDOWS: ${{ inputs.arch }} # AMD64 x86 # ARM64 creates problems with msgpack-c
         CIBW_ARCHS_LINUX: ${{ inputs.arch }} # i686 x86_64 aarch64 ppc64le s390x
         CIBW_TEST_COMMAND: python -c "import CoolProp; assert '?' not in CoolProp.__gitrevision__"
-        CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-        CIBW_MANYLINUX_I686_IMAGE: manylinux2014
-        CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
+        # Linux manylinux image policy is selected in the preceding step.
         # CIBW_SKIP: "pp*"
         CIBW_TEST_SKIP: "*-macosx_arm64 *-win_arm64"
       with:
