@@ -39,14 +39,26 @@ recursion_contract:
   append_new_event: true
   emit_message_home: true
   recurse_until: [DoV_achieved, Governor_hold, value_below_threshold, mission_superseded, governed_return]
+latest_qualified_runtime:
+  workflow_file: qps_w145_lkt_2kop_crosswalk.yml
+  run_id: 34707993462
+  job_id: 103591440737
+  source_sha: 3f3b4b1e016a940b9b29102cf264bfac43d19e18
+  merge_sha: 9e5927ddae4678f1c38947b261bbb21e2425c7c2
+  runner_id: 1000256609
+  receipt_sha256: 0d788a4e0104fa6c155071704f8eda3c7e5f3a384df2406e117377c3b27d321c
+  states: {A: PASS, B: PASS, D: PASS, E: PASS, W: PASS}
+  status: PASS
+  authority: COMPATIBILITY_REFERENCE_CALCULATED
+  engineering_promotion: WITHHELD
 current_snapshot:
-  observed_at_utc: 2026-09-11T14:41:00Z
+  observed_at_utc: 2026-09-12T17:25:25Z
   repo: GBOGEB/CoolProp
-  master_sha: ee16f902af3a121022e7395590f9c95f1ea4c00d
+  master_sha: 9e5927ddae4678f1c38947b261bbb21e2425c7c2
   mission_state: EXECUTABLE
-  qualified_state: PROVEN_FOR_A_B_D_W_ONLY
+  qualified_state: COMPATIBILITY_REFERENCE_A_B_D_E_W_PROVEN
   current_wave: CONTROL_TO_SCIENCE
-  current_pulse: P3_EXACT_HEAD_ACCEPTED
+  current_pulse: W145_EXACT_SOURCE_A_B_D_E_W_ACCEPTED
   BG:
     - id: BG-HEPAK-CROSSCHECK
       owner: [Scientist, Technical_Manager]
@@ -67,6 +79,7 @@ current_snapshot:
     - CG-HEPAK-CROSSCHECK
     - CG-GOVERNED-PROPERTY-ADAPTER
     - CG-SEPARATE-QPS-CONSUMER
+    - CG-FAST_HEAVY_RUNTIME_SPLIT
   crew:
     active: [Project_Manager, Technical_Manager, Analyst, Scientist, The_Engineer, QA_Officer_Signalman]
     reserve: [Dockmaster, Doctor, Ambassador, Governor]
@@ -74,22 +87,22 @@ current_snapshot:
   metrics:
     visibility: 0.95
     runtime_proof: 1.00
-    evidence_completeness: 0.80
-    technical_confidence: 0.76
+    evidence_completeness: 0.85
+    technical_confidence: 0.78
     repair_closure: 1.00
-    harvest_readiness: 0.55
+    harvest_readiness: 0.60
     federation_readiness: 0.10
-    mission_DoD: 0.76
+    mission_DoD: 0.78
     mission_DoV_level: 0
   management_decision:
     PM: STAY
-    TM: STAY_WITH_2K_PROMOTION_HOLD
-    Analyst: RECONFIGURE_FROM_DOCKMASTER_TO_SCIENTIST_ENGINEER_QA
-    Orchestrator: CONTRACT_RECON_EXPAND_ENGINEERING
+    TM: STAY_WITH_ENGINEERING_PROMOTION_HOLD
+    Analyst: RECONFIGURE_TO_PERFORMANCE_CONTROL_READER_REPAIR
+    Orchestrator: MEASURE_SPLIT_CLASSIFY_THEN_REPAIR_FIRST_TRUE_RED
   message_home:
     color: AMBER
-    summary: exact_head_execution_is_now_proven_for_A_B_D_W;_runtime_and_SHA_binding_BGs_retired;_remaining_path_is_HEPAK_crosscheck_then_adapter_then_independent_consumer
-latest_accepted_event_id: EVT-0006
+    summary: exact_source_W145_runtime_is_5_of_5_PASS_for_A_B_D_E_W_as_compatibility_reference;_engineering_authority_remains_withheld;_next_pressure_is_runtime_phase_telemetry_status_staleness_and_first_true_red_classification
+latest_accepted_event_id: EVT-0007
 events:
   - id: EVT-0001
     parent: null
@@ -153,3 +166,22 @@ events:
     next_BG: [BG-HEPAK-CROSSCHECK, BG-LOCAL-ADAPTER-MISSING, BG-FEDERATION-CONSUMER-MISSING]
     crew_action: RECONFIGURE
     decision: STAY
+  - id: EVT-0007
+    parent: EVT-0006
+    time_utc: 2026-09-12T17:25:25Z
+    type: W145_EXACT_SOURCE_COMPATIBILITY_PROOF
+    state_after: COMPATIBILITY_REFERENCE_A_B_D_E_W_PROVEN
+    evidence:
+      workflow_run_id: 34707993462
+      job_id: 103591440737
+      source_sha: 3f3b4b1e016a940b9b29102cf264bfac43d19e18
+      merge_sha: 9e5927ddae4678f1c38947b261bbb21e2425c7c2
+      runner_id: 1000256609
+      required_points: {A: PASS, B: PASS, D: PASS, E: PASS, W: PASS}
+      receipt_sha256: 0d788a4e0104fa6c155071704f8eda3c7e5f3a384df2406e117377c3b27d321c
+      raw_boundary_enthalpy_rate_W: {A_to_B_plus_W: 4690.283467827808, D_to_E: 8560.975500934597}
+      authority: COMPATIBILITY_REFERENCE_CALCULATED
+      Qeq_promotion: WITHHELD
+    next_BG: [BG-HEPAK-CROSSCHECK, BG-LOCAL-ADAPTER-MISSING, BG-FEDERATION-CONSUMER-MISSING]
+    next_CG: [CG-FAST_HEAVY_RUNTIME_SPLIT, CG-RUNTIME_PHASE_TELEMETRY, CG-STATUS_STALENESS_GUARD]
+    decision: ADVANCE_CONTROL_AND_PERFORMANCE
