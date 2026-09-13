@@ -1,0 +1,122 @@
+schema: qps.mission_i.ci_red_classification.v1
+mission: M01_COOLPROP
+wave: W4
+observed_pr: 8
+observed_head_sha: 5c011e041335f19ea28093c7652632c0ecf16c87
+principle: classify_before_repair
+allowed_classes:
+  - FUNCTIONAL
+  - INFRA
+  - SECRET
+  - STALE
+  - POLICY
+allowed_dispositions:
+  - ACCEPT
+  - REJECT
+  - DEFER
+  - BD
+  - ACTIVE
+rules:
+  target_never_executed_is_not_functional_failure: true
+  secret_or_licensed_dependency_is_not_repaired_as_product_code: true
+  repair_requires_observed_repairable_first_red: true
+  recurse_from_first_new_red_only: true
+entries:
+  - id: W4-R01
+    workflow: Documentation Docker image
+    run_id: 34753882386
+    job_id: 103714874528
+    target_stage: Build and push Docker image
+    first_red_stage: Log in to the Container registry
+    target_executed: false
+    class: POLICY
+    secondary_class: SECRET
+    evidence:
+      error: Username and password required
+      pr_path_pushes_image: false
+      login_was_unconditionally_required: true
+    disposition: ACCEPT
+    action: bounded_policy_repair
+    repair_pr: 9
+    victory: login_skipped_on_pull_request_and_docker_build_executes_with_push_false
+
+  - id: W4-R02
+    workflow: Testing Catch2
+    run_id: 34753882417
+    job_id: 103714874637
+    target_stage: Build_and_run_Catch2_tests
+    first_red_stage: Build REFPROP
+    target_executed: false
+    class: SECRET
+    evidence:
+      REFPROP_GPG_PASSPHRASE_present: false
+      gpg_decryption: failed_bad_session_key
+      REFPROP_sources_available: false
+      Catch2_build_executed: false
+    disposition: DEFER
+    blocker: licensed_REFPROP_input_or_CI_decoupling_required
+    prohibited_action: do_not_repair_Catch2_from_this_red
+
+  - id: W4-R03
+    workflow: run address sanitizer
+    run_id: 34753882399
+    job_id: 103714874779
+    target_stage: run_all_compiled_Catch_tests_with_address_sanitizer
+    first_red_stage: Build REFPROP
+    target_executed: false
+    class: SECRET
+    evidence:
+      licensed_REFPROP_setup_required_before_ASAN: true
+      ASAN_test_stage_executed: false
+    disposition: DEFER
+    blocker: licensed_REFPROP_input_or_CI_decoupling_required
+    prohibited_action: do_not_repair_ASAN_from_this_red
+
+  - id: W4-R04
+    workflow: Documentation builds (HTML)
+    run_id: 34753882422
+    job_id: 103714874766
+    target_stage: documentation_build
+    first_red_stage: Initialize containers
+    target_executed: false
+    class: SECRET
+    evidence:
+      container_image: ghcr.io/coolprop/coolprop_docs_02_builder:dev
+      docker_pull: denied
+      image_contains_REFPROP: true
+      image_documented_as_non_public: true
+    disposition: BD
+    blocker: licensed_non_public_REFPROP_builder_image_access_or_governed_substitute_required
+    prohibited_action: do_not_classify_as_documentation_source_failure
+
+  - id: W4-R05
+    workflow: Python cibuildwheel
+    run_id: 34753882535
+    target_stage: Build and test wheels
+    target_executed: true
+    class: FUNCTIONAL
+    disposition: ACTIVE
+    evidence:
+      source_package: PASS
+      matrix_jobs: IN_PROGRESS
+    next_action: wait_for_first_completed_failed_matrix_job_then_anchor_exact_error
+
+controls:
+  - workflow: QPS Mission I Control + Phase Telemetry
+    run_id: 34753882448
+    job_id: 103714875077
+    status: PASS
+    first_red: null
+    telemetry_sha256: 43ef95441ce49f023be952afa2cf3cb4354f7cb20ff7a65b25a75caf667d190c
+  - workflow: QPS W3-12 HEPAK Authority Gate
+    run_id: 34753882408
+    status: PASS
+
+summary:
+  classified_reds: 4
+  functional_repair_candidates_confirmed: 0
+  policy_repairs_active: 1
+  secret_or_licensed_deferred: 3
+  functional_candidate_under_observation: Python_cibuildwheel
+  unclassified_red_target: 0
+  next_pressure: first_completed_failed_python_cibuildwheel_matrix_job
