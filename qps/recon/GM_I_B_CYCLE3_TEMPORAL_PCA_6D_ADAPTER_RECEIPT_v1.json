@@ -1,0 +1,88 @@
+{
+  "schema": "coolprop.gm_i_b.3p_ral_cycle3_6d_domain_adapter_postproof_attestation.v1",
+  "status": "ACCEPT_SCHEMA_ADAPTER_ONLY",
+  "mission": "GM-I-B",
+  "cycle": 3,
+  "cycle_ordinal": "3P#3",
+  "child_target": "T2_COOLPROP",
+  "consumer": "GBOGEB/CoolProp",
+  "authority_transfer": false,
+  "formal_credit_delta": 0,
+  "engineering_authority_created": false,
+  "hard_gate_compensation_allowed": false,
+  "source_atom": {
+    "keb_item_id": "KEB-ITEM-0002",
+    "codex_merge_sha": "bd1fb697e6aa86ebc077b92015201ad512728a13",
+    "source_digest": "sha256:876c55c759de33392985f693f1735cdc0d38dda7d7b7a6c80ee80aee33fd8405",
+    "authority_cap": "A3_SYNTHETIC_ONLY"
+  },
+  "missioncontrol_contract": {
+    "merge_sha": "3348189fd52883befb24f5c5b6bb3953cd8725ab",
+    "path": "mission-control/grand-missions/GM_I_B_CYCLE3_PROPAGATION_CONTRACT_v1.json"
+  },
+  "coolprop_transaction": {
+    "pr": 12,
+    "tested_exact_head": "b2f6fc4e8760c3d6fe608f6673e4a4155e116233",
+    "merge_sha": "6f4905a95ed90dafe72f2b237df91896f540b7f4",
+    "workflow_run": 35154983524,
+    "workflow_job": 104992179225,
+    "workflow_result": "SUCCESS",
+    "workflow_steps_gt_zero": true,
+    "artifact_id": 10471025052,
+    "artifact_sha256": "05d3f026408a079038612b23191efcee14e2f2db03481dc3012f00d835b13a07",
+    "runtime_receipt_sha256": "713e4ba99bd1aff7240e4f1e02956d45073ace20ac09c05d7cd9af310a4796b8",
+    "crosswalk_receipt_sha256": "585eaaa412dc118bffb04cc5d0b2e9d24650996650b0740950254820e2a3b416"
+  },
+  "feature_dimension": 6,
+  "feature_schema": [
+    {"name": "T_K", "unit": "K"},
+    {"name": "p_Pa", "unit": "Pa"},
+    {"name": "h_J_kg", "unit": "J/kg"},
+    {"name": "s_J_kgK", "unit": "J/(kg*K)"},
+    {"name": "rho_kg_m3", "unit": "kg/m^3"},
+    {"name": "cp_J_kgK", "unit": "J/(kg*K)"}
+  ],
+  "state_order": ["A", "B", "D", "E", "W"],
+  "feature_matrix": [
+    [4.5, 300000.0, 1719.849460809816, 36.084688841132916, 129.31263076205394, 4553.948357608077],
+    [3.6, 2200.0, 23621.26948439968, 12949.212985916301, 0.29631623676825364, 5230.687838030045],
+    [40.0, 1260000.0, 212283.6499554359, 12212.667861356993, 14.750253260351784, 5340.843694714124],
+    [60.0, 1150000.0, 317974.70552252966, 14551.305489035165, 9.019831082045625, 5253.121044170016],
+    [300.0, 110000.0, 1563352.0799803361, 27809.74076101107, 0.17642218079994915, 5193.199443558385]
+  ],
+  "semantic_invariants": {
+    "component_assignment_precedes_sign_alignment": true,
+    "raw_pca_loading_sign_is_not_physical_direction": true,
+    "attenuation_toward_parity_is_distinct_from_direction_reversal": true,
+    "small_eigengap_requires_subspace_context": true,
+    "temporal_state_adjacency_does_not_require_equal_wall_time_or_exposure_age_steps": true,
+    "named_clocks": ["k", "t", "a", "wave", "pulse", "pr", "run", "release"]
+  },
+  "generalisation": {
+    "domain_adapter_only": true,
+    "computes_pca": false,
+    "imports_gg_MATH": false,
+    "imports_ABACUS_temporal_PCA": false,
+    "duplicate_implementation_count": 0,
+    "feature_dimension_is_not_display_dimension": true,
+    "schema_mapping_is_pca_result": false,
+    "missing_value_imputation_performed": false
+  },
+  "kpi": {
+    "propagation_targets_total": 3,
+    "propagation_targets_reached": 2,
+    "propagation_coverage": 0.6666666666666666,
+    "semantic_invariants_total": 6,
+    "semantic_invariants_preserved": 6,
+    "semantic_parity": 1.0,
+    "reuse_ratio": 1.0,
+    "duplicate_implementation_count": 0,
+    "child_targets_total": 2,
+    "child_dispositions_observed": 1,
+    "child_disposition_coverage": 0.5,
+    "propagation_depth_from_keb_atom": 2,
+    "authority_inversion_count": 0
+  },
+  "provenance_note": "This committed object is an immutable post-proof attestation of the exact hosted runtime receipt and artifact. It is not a replacement computation and does not promote CoolProp or the mapped thermophysical states to QPS engineering authority.",
+  "next_action": "PROPAGATE_TO_T3_QPS_TRIAGE"
+}
