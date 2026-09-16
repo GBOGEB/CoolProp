@@ -40,12 +40,13 @@ def main():
       'authority_boundary': atom['authority_guards']['authority_transfer'] is False and x['authority']['engineering_promotion_forbidden'] is True
     }
     ok=all(checks.values())
+    exact_head=os.environ.get('EXACT_HEAD') or os.environ.get('GITHUB_SHA','LOCAL_UNBOUND')
     out={
       'schema':'coolprop.gm_i_b.3p_ral_cycle3_6d_domain_adapter_receipt.v1',
       'created_utc':datetime.now(UTC).replace(microsecond=0).isoformat(),
       'status':'ACCEPT_SCHEMA_ADAPTER_ONLY' if ok else 'DEFER_SCHEMA_ADAPTER',
       'consumer':'GBOGEB/CoolProp',
-      'source_head':os.environ.get('GITHUB_SHA','LOCAL_UNBOUND'),
+      'source_head':exact_head,
       'missioncontrol_contract_merge':'3348189fd52883befb24f5c5b6bb3953cd8725ab',
       'source_atom':{'keb_item_id':atom['keb_item_id'],'source_digest':atom['source_digest'],'authority_cap':atom['authority_cap']},
       'feature_dimension':6,
