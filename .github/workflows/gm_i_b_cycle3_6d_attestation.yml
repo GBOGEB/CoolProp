@@ -1,0 +1,46 @@
+name: GM-I-B Cycle3 6D Attestation
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'qps/recon/GM_I_B_CYCLE3_TEMPORAL_PCA_6D_ADAPTER_RECEIPT_v1.json'
+      - 'qps/recon/validate_gm_i_b_cycle3_6d_attestation.py'
+      - '.github/workflows/gm_i_b_cycle3_6d_attestation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  attestation:
+    runs-on: ubuntu-latest
+    env:
+      EXACT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Checkout literal attestation head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
+      - name: Verify literal attestation head
+        run: test "$(git rev-parse HEAD)" = "$EXACT_HEAD"
+      - name: Fetch immutable Cycle3 contract and KEB atom
+        run: |
+          mkdir -p qps/recon/input
+          curl --fail --location https://raw.githubusercontent.com/GBOGEB/pipeline-automation-hub/3348189fd52883befb24f5c5b6bb3953cd8725ab/mission-control/grand-missions/GM_I_B_CYCLE3_PROPAGATION_CONTRACT_v1.json --output qps/recon/input/gm_i_b_cycle3_contract.json
+          curl --fail --location https://raw.githubusercontent.com/GBOGEB/CODEX/bd1fb697e6aa86ebc077b92015201ad512728a13/ssot/bridge_rows/gg_math_temporal_pca_w4_p31_knowledge_atom.json --output qps/recon/input/keb_item_0002.json
+      - name: Validate post-proof attestation
+        run: |
+          python qps/recon/validate_gm_i_b_cycle3_6d_attestation.py \
+            --attestation qps/recon/GM_I_B_CYCLE3_TEMPORAL_PCA_6D_ADAPTER_RECEIPT_v1.json \
+            --contract qps/recon/input/gm_i_b_cycle3_contract.json \
+            --atom qps/recon/input/keb_item_0002.json
+      - name: Upload immutable attestation proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: gm-i-b-cycle3-coolprop-attestation-${{ env.EXACT_HEAD }}
+          path: |
+            qps/recon/GM_I_B_CYCLE3_TEMPORAL_PCA_6D_ADAPTER_RECEIPT_v1.json
+            qps/recon/input/gm_i_b_cycle3_contract.json
+            qps/recon/input/keb_item_0002.json
+          if-no-files-found: error
