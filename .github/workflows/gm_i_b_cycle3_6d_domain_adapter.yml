@@ -1,0 +1,81 @@
+name: GM-I-B Cycle3 6D Domain Adapter
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'qps/recon/gm_i_b_cycle3_6d_adapter.py'
+      - '.github/workflows/gm_i_b_cycle3_6d_domain_adapter.yml'
+      - 'qps/recon/probe_lkt_2kop_enthalpy_crosswalk.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  domain-adapter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EXACT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Checkout exact CoolProp head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXACT_HEAD }}
+          fetch-depth: 0
+          submodules: recursive
+      - name: Assert exact source head
+        run: test "$(git rev-parse HEAD)" = "$EXACT_HEAD"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact CoolProp checkout
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "scikit-build-core>=0.10" "cython>=0.29" "numpy>=1.20"
+          python -m pip install --no-build-isolation .
+      - name: Fetch immutable Cycle3 contract and KEB atom
+        run: |
+          mkdir -p qps/recon/input
+          curl --fail --location https://raw.githubusercontent.com/GBOGEB/pipeline-automation-hub/3348189fd52883befb24f5c5b6bb3953cd8725ab/mission-control/grand-missions/GM_I_B_CYCLE3_PROPAGATION_CONTRACT_v1.json --output qps/recon/input/gm_i_b_cycle3_contract.json
+          curl --fail --location https://raw.githubusercontent.com/GBOGEB/CODEX/bd1fb697e6aa86ebc077b92015201ad512728a13/ssot/bridge_rows/gg_math_temporal_pca_w4_p31_knowledge_atom.json --output qps/recon/input/keb_item_0002.json
+      - name: Reuse proven W145 thermophysical crosswalk
+        run: python qps/recon/probe_lkt_2kop_enthalpy_crosswalk.py
+      - name: Build typed 6D adapter receipt
+        run: |
+          python qps/recon/gm_i_b_cycle3_6d_adapter.py \
+            --contract qps/recon/input/gm_i_b_cycle3_contract.json \
+            --atom qps/recon/input/keb_item_0002.json \
+            --crosswalk qps/recon/receipts/lkt_2kop_enthalpy_crosswalk.json
+      - name: Verify propagation KPIs and receipt identity
+        run: |
+          python - <<'PY'
+          import json, os
+          r=json.load(open('qps/recon/GM_I_B_CYCLE3_TEMPORAL_PCA_6D_ADAPTER_RECEIPT_v1.json'))
+          assert r['status']=='ACCEPT_SCHEMA_ADAPTER_ONLY'
+          assert r['source_head']==os.environ['EXACT_HEAD']
+          assert r['feature_dimension']==6
+          assert len(r['feature_matrix'])==5 and all(len(x)==6 for x in r['feature_matrix'])
+          assert r['kpi']['propagation_targets_reached']==2
+          assert abs(r['kpi']['propagation_coverage']-2/3)<1e-12
+          assert r['kpi']['semantic_parity']==1.0
+          assert r['kpi']['reuse_ratio']==1.0
+          assert r['kpi']['duplicate_implementation_count']==0
+          assert r['kpi']['child_disposition_coverage']==0.5
+          assert r['kpi']['propagation_depth_from_keb_atom']==2
+          assert r['kpi']['authority_inversion_count']==0
+          assert r['generalisation']['computes_pca'] is False
+          assert r['authority_transfer'] is False
+          print('PASS_GM_I_B_CYCLE3_COOLPROP_6D_ADAPTER')
+          PY
+      - name: Upload child propagation receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: gm-i-b-cycle3-coolprop-${{ env.EXACT_HEAD }}
+          path: |
+            qps/recon/GM_I_B_CYCLE3_TEMPORAL_PCA_6D_ADAPTER_RECEIPT_v1.json
+            qps/recon/receipts/lkt_2kop_enthalpy_crosswalk.json
+            qps/recon/input/gm_i_b_cycle3_contract.json
+            qps/recon/input/keb_item_0002.json
+          if-no-files-found: error
