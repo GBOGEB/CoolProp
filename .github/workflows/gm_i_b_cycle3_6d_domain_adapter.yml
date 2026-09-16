@@ -48,12 +48,13 @@ jobs:
             --contract qps/recon/input/gm_i_b_cycle3_contract.json \
             --atom qps/recon/input/keb_item_0002.json \
             --crosswalk qps/recon/receipts/lkt_2kop_enthalpy_crosswalk.json
-      - name: Verify propagation KPIs
+      - name: Verify propagation KPIs and receipt identity
         run: |
           python - <<'PY'
-          import json
+          import json, os
           r=json.load(open('qps/recon/GM_I_B_CYCLE3_TEMPORAL_PCA_6D_ADAPTER_RECEIPT_v1.json'))
           assert r['status']=='ACCEPT_SCHEMA_ADAPTER_ONLY'
+          assert r['source_head']==os.environ['EXACT_HEAD']
           assert r['feature_dimension']==6
           assert len(r['feature_matrix'])==5 and all(len(x)==6 for x in r['feature_matrix'])
           assert r['kpi']['propagation_targets_reached']==2
