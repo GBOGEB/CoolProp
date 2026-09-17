@@ -1,0 +1,109 @@
+name: MP_P6 MIP Hardened Skill Portability
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/workflows/mp-p6-mip-hardened-skill-portability.yml'
+      - 'qps/recon/MP_P6_MIP_HARDENED_SKILL_PORTABILITY_v1.yaml'
+
+permissions:
+  contents: read
+
+env:
+  MISSIONCONTROL_SHA: aa3db4cad72472fce18bb8e489f5bb7b39af4c01
+  SKILLS_SHA: 905a12596412afacd3cd7f3c3f6891ac026abf8f
+
+jobs:
+  prove-hardened-skill-portability:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout consumer exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Assert consumer exact head
+        shell: bash
+        run: test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+
+      - name: Checkout MissionControl hardened validator exact SHA
+        uses: actions/checkout@v4
+        with:
+          repository: GBOGEB/pipeline-automation-hub
+          ref: ${{ env.MISSIONCONTROL_SHA }}
+          path: .missioncontrol
+
+      - name: Assert MissionControl exact SHA
+        shell: bash
+        run: test "$(git -C .missioncontrol rev-parse HEAD)" = "${MISSIONCONTROL_SHA}"
+
+      - name: Checkout canonical skills exact SHA
+        uses: actions/checkout@v4
+        with:
+          repository: GBOGEB/skills
+          ref: ${{ env.SKILLS_SHA }}
+          path: .skills
+
+      - name: Assert canonical skills exact SHA
+        shell: bash
+        run: test "$(git -C .skills rev-parse HEAD)" = "${SKILLS_SHA}"
+
+      - name: Resolve all canonical skills as CoolProp consumer
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p consumer-receipts
+          for skill in math plots math-plots; do
+            python .missioncontrol/mission-control/qps-triage-ultra/crew/resolve_crew_skill.py \
+              --skills-root .skills \
+              --skill "$skill" \
+              --task-id "MP_P6_COOLPROP_${skill}" \
+              --source-repo "${GITHUB_REPOSITORY}" \
+              --source-ref '${{ github.event.pull_request.head.sha }}' \
+              --skills-ref "${SKILLS_SHA}" \
+              --resolution-mode mip_hardened_consumer \
+              --out "consumer-receipts/${skill}.json"
+          done
+
+      - name: Validate exact hardened receipt set
+        shell: bash
+        run: |
+          set -euo pipefail
+          python .missioncontrol/mission-control/qps-triage-ultra/crew/validate_skill_receipt_set.py \
+            --receipts-dir consumer-receipts \
+            --expected-source-repo "${GITHUB_REPOSITORY}" \
+            --expected-source-ref '${{ github.event.pull_request.head.sha }}' \
+            --skills-ref "${SKILLS_SHA}" \
+            --out aggregate-proof.json
+          python .missioncontrol/mission-control/qps-triage-ultra/crew/validate_skill_receipt_set.py \
+            --receipts-dir consumer-receipts \
+            --expected-source-repo "${GITHUB_REPOSITORY}" \
+            --expected-source-ref '${{ github.event.pull_request.head.sha }}' \
+            --skills-ref "${SKILLS_SHA}" \
+            --out aggregate-proof-replay.json
+          cmp aggregate-proof.json aggregate-proof-replay.json
+
+      - name: Upload math receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: mp-p6-coolprop-math-receipt
+          path: consumer-receipts/math.json
+
+      - name: Upload plots receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: mp-p6-coolprop-plots-receipt
+          path: consumer-receipts/plots.json
+
+      - name: Upload math-plots receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: mp-p6-coolprop-math-plots-receipt
+          path: consumer-receipts/math-plots.json
+
+      - name: Upload hardened aggregate proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: mp-p6-coolprop-hardened-aggregate-proof
+          path: aggregate-proof.json

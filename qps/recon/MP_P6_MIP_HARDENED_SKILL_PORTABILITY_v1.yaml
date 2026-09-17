@@ -1,0 +1,40 @@
+schema: coolprop.qps.mp_p6_mip_hardened_skill_portability.v1
+state: FROZEN_PRE_HOSTED_PROOF
+purpose: >-
+  Prove GBOGEB/CoolProp as a second independently governed consumer of the
+  canonical GBOGEB/skills stack using the exact MissionControl MIP hardening
+  validator, without copying skill bodies or transferring authority.
+consumer:
+  repo: GBOGEB/CoolProp
+  base_ref: master
+  base_sha: 0c645ac28ac73e1873268a3f6f505aaeffb41a8d
+pins:
+  missioncontrol_ref: aa3db4cad72472fce18bb8e489f5bb7b39af4c01
+  skills_ref: 905a12596412afacd3cd7f3c3f6891ac026abf8f
+  skills_repo: GBOGEB/skills
+required_skills: [math, plots, math-plots]
+resolution_mode: mip_hardened_consumer
+proof_contract:
+  validator: mission-control/qps-triage-ultra/crew/validate_skill_receipt_set.py
+  exact_consumer_head_required: true
+  three_individual_receipts_required: true
+  deterministic_aggregate_receipt_required: true
+  entrypoint_sha256_required: true
+  authority_transfer_must_be_false: true
+  copied_skill_body_allowed: false
+scope:
+  target_skill_clock: SKILL_P5
+  frozen_metric: independent_consumer_repositories_with_exact_pinned_receipts
+  frozen_prediction: 2
+  existing_independent_consumer: GBOGEB/gg_MATH
+  candidate_second_consumer: GBOGEB/CoolProp
+non_compensation:
+  prior_gm_i_b_coolprop_receipts_count_as_this_actual: false
+  qps_private_gt_bdq_0_burned_by_this_proof: false
+  qps_private_hosted_seven_file_actual_changed: false
+  formal_credit_delta: 0
+  authority_transfer: false
+stop_rule: >-
+  A hosted success is insufficient unless the exact PR head, exact skills ref,
+  exact MissionControl hardening ref, all three receipt semantics and the
+  aggregate receipt-set digest are jointly bound. Any mismatch stops the pulse.
