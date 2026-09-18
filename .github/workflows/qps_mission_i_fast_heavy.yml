@@ -1,0 +1,190 @@
+name: QPS Mission I FAST-HEAVY Runtime Boundary
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/workflows/qps_mission_i_fast_heavy.yml'
+      - 'pyproject.toml'
+      - 'src/**'
+      - 'include/**'
+      - 'wrappers/Python/**'
+      - 'dev/fluids/Helium.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  heavy-producer:
+    name: HEAVY producer - exact-source wheel
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Checkout exact source head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXPECTED_SOURCE_SHA }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Assert exact source head
+        run: |
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+          echo "expected=${EXPECTED_SOURCE_SHA}"
+          echo "actual=${ACTUAL_SHA}"
+          test "${ACTUAL_SHA}" = "${EXPECTED_SOURCE_SHA}"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build prerequisites
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "scikit-build-core>=0.10" "cython>=0.29" "numpy>=1.20" wheel
+
+      - name: Build exact-source wheel once
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p qps-fast-heavy
+          t0="$(date +%s)"
+          python -m pip wheel --no-build-isolation --no-deps . -w qps-fast-heavy
+          t1="$(date +%s)"
+          wheel_path="$(find qps-fast-heavy -maxdepth 1 -type f -name 'CoolProp-*.whl' -print -quit)"
+          test -n "${wheel_path}"
+          wheel_sha="$(sha256sum "${wheel_path}" | awk '{print $1}')"
+          python - "${EXPECTED_SOURCE_SHA}" "${wheel_path}" "${wheel_sha}" "$((t1-t0))" <<'PY'
+          import json, os, platform, subprocess, sys
+          source_sha, wheel_path, wheel_sha, build_seconds = sys.argv[1:]
+          manifest = {
+              "schema": "qps.mission_i.fast_heavy.v1",
+              "producer_class": "HEAVY",
+              "source_sha": source_sha,
+              "wheel_filename": os.path.basename(wheel_path),
+              "wheel_sha256": wheel_sha,
+              "build_seconds": int(build_seconds),
+              "python": platform.python_version(),
+              "platform": platform.platform(),
+              "machine": platform.machine(),
+              "compiler": platform.python_compiler(),
+              "authority": "COMPATIBILITY_RUNTIME_ONLY",
+              "engineering_promotion": "WITHHELD",
+          }
+          with open("qps-fast-heavy/producer_manifest.json", "w", encoding="utf-8") as f:
+              json.dump(manifest, f, indent=2, sort_keys=True)
+              f.write("\n")
+          PY
+          sha256sum qps-fast-heavy/producer_manifest.json > qps-fast-heavy/PRODUCER_MANIFEST_SHA256SUMS
+
+      - name: Upload exact-source build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qps-mission-i-heavy-${{ env.EXPECTED_SOURCE_SHA }}
+          path: qps-fast-heavy/
+          if-no-files-found: error
+
+  fast-consumer:
+    name: FAST consumer - artifact-only helium probe
+    needs: heavy-producer
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download qualified HEAVY artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: qps-mission-i-heavy-${{ env.EXPECTED_SOURCE_SHA }}
+          path: qps-fast-heavy
+
+      - name: Verify producer binding and install without rebuild
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum -c qps-fast-heavy/PRODUCER_MANIFEST_SHA256SUMS
+          python - <<'PY'
+          import hashlib, json, pathlib, os
+          root = pathlib.Path("qps-fast-heavy")
+          manifest = json.loads((root / "producer_manifest.json").read_text())
+          assert manifest["producer_class"] == "HEAVY"
+          assert manifest["source_sha"] == os.environ["EXPECTED_SOURCE_SHA"]
+          wheel = root / manifest["wheel_filename"]
+          assert wheel.is_file()
+          assert hashlib.sha256(wheel.read_bytes()).hexdigest() == manifest["wheel_sha256"]
+          print(wheel)
+          PY
+          wheel_path="$(python - <<'PY'
+          import json, pathlib
+          root=pathlib.Path("qps-fast-heavy")
+          m=json.loads((root/"producer_manifest.json").read_text())
+          print(root/m["wheel_filename"])
+          PY
+          )"
+          python -m pip install --no-deps "${wheel_path}"
+
+      - name: Execute real FAST helium calculation and emit receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          t0="$(date +%s%N)"
+          python - <<'PY'
+          import hashlib, json, math, os, pathlib, platform, time
+          import CoolProp, CoolProp.CoolProp as CP
+          root=pathlib.Path("qps-fast-heavy")
+          manifest=json.loads((root/"producer_manifest.json").read_text())
+          cases=[
+              {"name":"ambient","T_K":300.0,"P_Pa":101325.0},
+              {"name":"w145_A","T_K":4.5,"P_Pa":300000.0},
+          ]
+          values=[]
+          for case in cases:
+              h=CP.PropsSI("H","T",case["T_K"],"P",case["P_Pa"],"Helium")
+              rho=CP.PropsSI("D","T",case["T_K"],"P",case["P_Pa"],"Helium")
+              assert math.isfinite(h) and math.isfinite(rho)
+              values.append({**case,"h_J_kg":h,"rho_kg_m3":rho})
+          receipt={
+              "schema":"qps.mission_i.fast_heavy.v1",
+              "consumer_class":"FAST",
+              "source_sha":manifest["source_sha"],
+              "wheel_sha256":manifest["wheel_sha256"],
+              "coolprop_version":CoolProp.__version__,
+              "calculations":values,
+              "calculations_passed":len(values),
+              "build_invoked":False,
+              "source_checkout_performed":False,
+              "status":"PASS",
+              "authority":"COMPATIBILITY_RUNTIME_ONLY",
+              "engineering_promotion":"WITHHELD",
+              "python":platform.python_version(),
+          }
+          p=root/"fast_consumer_receipt.json"
+          p.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
+          PY
+          t1="$(date +%s%N)"
+          python - "$(( (t1-t0)/1000000 ))" <<'PY'
+          import json, pathlib, sys
+          p=pathlib.Path("qps-fast-heavy/fast_consumer_receipt.json")
+          d=json.loads(p.read_text())
+          d["probe_elapsed_ms"]=int(sys.argv[1])
+          p.write_text(json.dumps(d,indent=2,sort_keys=True)+"\n")
+          PY
+          sha256sum qps-fast-heavy/fast_consumer_receipt.json > qps-fast-heavy/FAST_CONSUMER_SHA256SUMS
+
+      - name: Upload FAST receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: qps-mission-i-fast-${{ env.EXPECTED_SOURCE_SHA }}
+          path: |
+            qps-fast-heavy/producer_manifest.json
+            qps-fast-heavy/PRODUCER_MANIFEST_SHA256SUMS
+            qps-fast-heavy/fast_consumer_receipt.json
+            qps-fast-heavy/FAST_CONSUMER_SHA256SUMS
+          if-no-files-found: error
