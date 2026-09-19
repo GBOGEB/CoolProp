@@ -54,7 +54,7 @@ jobs:
           t0="$(date +%s)"
           python -m pip wheel --no-build-isolation --no-deps . -w qps-fast-heavy
           t1="$(date +%s)"
-          wheel_path="$(find qps-fast-heavy -maxdepth 1 -type f -name 'CoolProp-*.whl' -print -quit)"
+          wheel_path="$(find qps-fast-heavy -maxdepth 1 -type f -iname 'coolprop-*.whl' -print -quit)"
           test -n "${wheel_path}"
           wheel_sha="$(sha256sum "${wheel_path}" | awk '{print $1}')"
           python - "${EXPECTED_SOURCE_SHA}" "${wheel_path}" "${wheel_sha}" "$((t1-t0))" <<'PY'
