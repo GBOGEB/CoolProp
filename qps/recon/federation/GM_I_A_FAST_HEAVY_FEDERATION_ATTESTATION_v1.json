@@ -1,0 +1,67 @@
+{
+  "schema": "qps.gm_i_a.fast_heavy.federation_attestation.v1",
+  "provider_repo": "GBOGEB/CoolProp",
+  "mission": "GM-I-A",
+  "lane": "L9_FEDERATION",
+  "source_head_sha": "47cc8dced9278d50714ac39ef0a2edab7458c6a0",
+  "source_merge_sha": "9d10914924810c26a0d88f8aaea4db03b7a3d38e",
+  "repair_pr": 16,
+  "workflow": {
+    "file": ".github/workflows/qps_mission_i_fast_heavy.yml",
+    "run_id": 35424686224,
+    "run_number": 2,
+    "conclusion": "success"
+  },
+  "heavy": {
+    "job_id": 105848481303,
+    "runner_id": 1000315444,
+    "conclusion": "success",
+    "queue_seconds": 4,
+    "execute_seconds": 251,
+    "checkout_seconds": 37,
+    "build_seconds": 203,
+    "artifact": {
+      "id": 10578148926,
+      "name": "qps-mission-i-heavy-47cc8dced9278d50714ac39ef0a2edab7458c6a0",
+      "digest": "sha256:9cfeaa3d00ab1d41ba135a2f3f6d9e535aede7fc765027b8bd73251af8e344cf"
+    }
+  },
+  "fast": {
+    "job_id": 105848961200,
+    "runner_id": 1000315627,
+    "conclusion": "success",
+    "queue_seconds": 512,
+    "execute_seconds": 7,
+    "calculation_step_seconds": 1,
+    "calculations_passed": 2,
+    "build_invoked": false,
+    "source_checkout_performed": false,
+    "artifact": {
+      "id": 10578898743,
+      "name": "qps-mission-i-fast-47cc8dced9278d50714ac39ef0a2edab7458c6a0",
+      "digest": "sha256:deb548d884f2dd4e8f0d077b3edc2259cf58b1bdd22c86167f2f67cbb2cda2b2"
+    }
+  },
+  "runtime_economics": {
+    "observed_dominant_heavy_phase": "BUILD",
+    "observed_fast_pressure": "RUNNER_QUEUE",
+    "fast_execution_is_independent_of_source_build": true,
+    "fast_runner_queue_seconds": 512,
+    "note": "FAST no longer rebuilds CoolProp, but runner contention dominates its wall-clock latency in this observed transaction."
+  },
+  "authority": {
+    "scope": "COMPATIBILITY_RUNTIME_ONLY",
+    "authority_transfer": false,
+    "engineering_promotion": "WITHHELD",
+    "hepak_authority": "UNCHANGED_EXTERNAL_GATE",
+    "qeq_sat_authority": "UNCHANGED_CHILD_EXTERNAL_GATE"
+  },
+  "federation": {
+    "state": "READY_FOR_INDEPENDENT_CONSUMER",
+    "intended_consumers": [
+      "GBOGEB/ABACUS",
+      "GBOGEB/pipeline-automation-hub"
+    ],
+    "rule": "Consumers must bind this immutable attestation by exact commit and digest; successful consumption does not transfer engineering authority."
+  }
+}

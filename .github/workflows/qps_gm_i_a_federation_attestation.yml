@@ -1,0 +1,33 @@
+name: QPS GM-I-A Federation Attestation
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'qps/recon/federation/GM_I_A_FAST_HEAVY_FEDERATION_ATTESTATION_v1.json'
+      - 'qps/recon/validate_gm_i_a_fast_heavy_attestation.py'
+      - '.github/workflows/qps_gm_i_a_federation_attestation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-attestation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate immutable federation attestation
+        run: python qps/recon/validate_gm_i_a_fast_heavy_attestation.py
+      - name: Bind attestation digest
+        run: |
+          sha256sum qps/recon/federation/GM_I_A_FAST_HEAVY_FEDERATION_ATTESTATION_v1.json \
+            | tee qps/recon/federation/GM_I_A_FAST_HEAVY_FEDERATION_ATTESTATION_SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qps-gm-i-a-federation-attestation-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            qps/recon/federation/GM_I_A_FAST_HEAVY_FEDERATION_ATTESTATION_v1.json
+            qps/recon/federation/GM_I_A_FAST_HEAVY_FEDERATION_ATTESTATION_SHA256SUMS
+          if-no-files-found: error
