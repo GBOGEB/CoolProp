@@ -1,0 +1,79 @@
+{
+  "schema": "qps.gm_i_a.fast_heavy.federation_attestation.v1",
+  "pulse_id": "GM-I-A-MCLOCK-P002",
+  "provider_repo": "GBOGEB/CoolProp",
+  "mission": "GM-I-A",
+  "lane": "L9_FEDERATION",
+  "source_head_sha": "a88d6e8cc24402868afab39a71fc49fcacec08c8",
+  "source_merge_sha": "e31433c4427be2aaad064294e6c6cab1843537df",
+  "runtime_pr": 18,
+  "workflow": {
+    "file": ".github/workflows/qps_mission_i_fast_heavy.yml",
+    "run_id": 36226071145,
+    "run_number": 3,
+    "run_attempt": 1,
+    "conclusion": "success"
+  },
+  "heavy": {
+    "job_id": 108360248113,
+    "runner_id": 1000343140,
+    "conclusion": "success",
+    "queue_seconds": 36,
+    "execute_seconds": 258,
+    "checkout_seconds": 34,
+    "build_seconds": 211,
+    "artifact": {
+      "id": 10901116658,
+      "name": "qps-mission-i-heavy-a88d6e8cc24402868afab39a71fc49fcacec08c8",
+      "digest": "sha256:f65cc08c99dafdf37afaea7da124b7e36e81c6fd5fc48a24f8af1cb668ac8cf4",
+      "wheel_sha256": "d342c86635472a63af42d0999e4dc0026dc185cf9e62c35ea0ca64bb02d8a7b4"
+    }
+  },
+  "fast": {
+    "job_id": 108360956408,
+    "runner_id": 1000343218,
+    "conclusion": "success",
+    "queue_seconds": 35,
+    "execute_seconds": 7,
+    "calculation_step_seconds": 1,
+    "probe_elapsed_ms": 833,
+    "calculations_passed": 2,
+    "build_invoked": false,
+    "source_checkout_performed": false,
+    "artifact": {
+      "id": 10900932108,
+      "name": "qps-mission-i-fast-a88d6e8cc24402868afab39a71fc49fcacec08c8",
+      "digest": "sha256:e432ed20b8053c9d9515a1d4bf127be88d9f0eccc447231da88757e0c9e447ae"
+    }
+  },
+  "runtime_economics": {
+    "observed_dominant_heavy_phase": "BUILD",
+    "observed_fast_pressure": "RUNNER_QUEUE",
+    "fast_execution_is_independent_of_source_build": true,
+    "fast_runner_queue_seconds": 35,
+    "comparison_to_p001": {
+      "heavy_queue_delta_seconds": 32,
+      "heavy_checkout_delta_seconds": -3,
+      "heavy_build_delta_seconds": 8,
+      "fast_queue_delta_seconds": -477,
+      "fast_execute_delta_seconds": 0
+    },
+    "note": "P002 holds workload semantics constant while measuring a fresh execution cohort. Queue movement is not interpreted as causal from two pulses."
+  },
+  "authority": {
+    "scope": "COMPATIBILITY_RUNTIME_ONLY",
+    "authority_transfer": false,
+    "engineering_promotion": "WITHHELD",
+    "hepak_authority": "UNCHANGED_EXTERNAL_GATE",
+    "qeq_sat_authority": "UNCHANGED_CHILD_EXTERNAL_GATE"
+  },
+  "federation": {
+    "state": "READY_FOR_INDEPENDENT_CONSUMER",
+    "intended_consumers": [
+      "GBOGEB/ABACUS",
+      "GBOGEB/CODEX",
+      "GBOGEB/pipeline-automation-hub"
+    ],
+    "rule": "Consumers must bind this P002 attestation by exact commit and digest; successful consumption does not transfer engineering authority."
+  }
+}
