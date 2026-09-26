@@ -3,51 +3,52 @@
   "provider_repo": "GBOGEB/CoolProp",
   "mission": "GM-I-A",
   "lane": "L9_FEDERATION",
-  "source_head_sha": "47cc8dced9278d50714ac39ef0a2edab7458c6a0",
-  "source_merge_sha": "9d10914924810c26a0d88f8aaea4db03b7a3d38e",
-  "repair_pr": 16,
+  "pulse_id": "GM-I-A-MCLOCK-P002",
+  "source_head_sha": "a88d6e8cc24402868afab39a71fc49fcacec08c8",
+  "source_merge_sha": "e31433c4427be2aaad064294e6c6cab1843537df",
+  "repair_pr": 18,
   "workflow": {
     "file": ".github/workflows/qps_mission_i_fast_heavy.yml",
-    "run_id": 35424686224,
-    "run_number": 2,
+    "run_id": 36226071145,
+    "run_number": null,
     "conclusion": "success"
   },
   "heavy": {
-    "job_id": 105848481303,
-    "runner_id": 1000315444,
+    "job_id": 108360248113,
+    "runner_id": 1000343140,
     "conclusion": "success",
-    "queue_seconds": 4,
-    "execute_seconds": 251,
-    "checkout_seconds": 37,
-    "build_seconds": 203,
+    "queue_seconds": 36,
+    "execute_seconds": 258,
+    "checkout_seconds": 34,
+    "build_seconds": 211,
     "artifact": {
-      "id": 10578148926,
-      "name": "qps-mission-i-heavy-47cc8dced9278d50714ac39ef0a2edab7458c6a0",
-      "digest": "sha256:9cfeaa3d00ab1d41ba135a2f3f6d9e535aede7fc765027b8bd73251af8e344cf"
+      "id": 10901116658,
+      "name": "qps-mission-i-heavy-a88d6e8cc24402868afab39a71fc49fcacec08c8",
+      "digest": "sha256:f65cc08c99dafdf37afaea7da124b7e36e81c6fd5fc48a24f8af1cb668ac8cf4"
     }
   },
   "fast": {
-    "job_id": 105848961200,
-    "runner_id": 1000315627,
+    "job_id": 108360956408,
+    "runner_id": 1000343218,
     "conclusion": "success",
-    "queue_seconds": 512,
+    "queue_seconds": 35,
     "execute_seconds": 7,
     "calculation_step_seconds": 1,
     "calculations_passed": 2,
     "build_invoked": false,
     "source_checkout_performed": false,
     "artifact": {
-      "id": 10578898743,
-      "name": "qps-mission-i-fast-47cc8dced9278d50714ac39ef0a2edab7458c6a0",
-      "digest": "sha256:deb548d884f2dd4e8f0d077b3edc2259cf58b1bdd22c86167f2f67cbb2cda2b2"
+      "id": 10900932108,
+      "name": "qps-mission-i-fast-a88d6e8cc24402868afab39a71fc49fcacec08c8",
+      "digest": "sha256:e432ed20b8053c9d9515a1d4bf127be88d9f0eccc447231da88757e0c9e447ae"
     }
   },
   "runtime_economics": {
     "observed_dominant_heavy_phase": "BUILD",
     "observed_fast_pressure": "RUNNER_QUEUE",
     "fast_execution_is_independent_of_source_build": true,
-    "fast_runner_queue_seconds": 512,
-    "note": "FAST no longer rebuilds CoolProp, but runner contention dominates its wall-clock latency in this observed transaction."
+    "fast_runner_queue_seconds": 35,
+    "note": "P002 fresh transaction. Queue and execution remain separate measured axes; no engineering authority is inferred."
   },
   "authority": {
     "scope": "COMPATIBILITY_RUNTIME_ONLY",
@@ -60,8 +61,9 @@
     "state": "READY_FOR_INDEPENDENT_CONSUMER",
     "intended_consumers": [
       "GBOGEB/ABACUS",
+      "GBOGEB/CODEX",
       "GBOGEB/pipeline-automation-hub"
     ],
-    "rule": "Consumers must bind this immutable attestation by exact commit and digest; successful consumption does not transfer engineering authority."
+    "rule": "Consumers must bind this P002 attestation by exact commit and digest; successful consumption does not transfer engineering authority."
   }
 }
